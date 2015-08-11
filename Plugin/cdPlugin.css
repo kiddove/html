@@ -1,0 +1,34 @@
+.vjs-control.vjs-skip-button {
+	display: none;
+	font-size: 2.0em;
+	line-height: 2;
+	position: absolute;
+	/*top: 0px;*/
+	margin-bottom: 0px;
+	float: right;
+	/*left: 10px;*/
+	height: 2.0em;
+	/*width:3.0em;*/
+	text-align: center;
+	cursor: pointer;
+	font-weight:normal;
+	bottom: 2.3em;
+    right: 0.5em;
+	background: rgba(7,20,30,.8);
+	width:auto;
+}
+.vjs-control.vjs-skip-button:hover {
+    text-shadow: 0 0 .3em rgba( 255,255,255,0.8);
+}
+
+.vjs-ad-playing.vjs-ad-enable-skip .vjs-control.vjs-skip-button {
+	display:block;
+}
+
+#example_url
+{
+	display:none;
+}
+
+/*for android... can not autoplay*/
+/*.video-js.vjs-default-skin .vjs-big-play-button { display: none; }*/
