@@ -505,21 +505,23 @@ console.log("page info: " + JSON.stringify(pinfo));
                 curAd = state.inventory.pre[Math.floor(Math.random() * state.inventory.pre.length)];
                 ca.src = curAd.src;
                 ca.type = curAd.type;
-                if (bMobile) {
-                    if (player.pageObj.multstream.indexOf("B") > 0 || player.pageObj.multstream.indexOf("b") > 0) {
-                        var pos = ca.src.lastIndexOf(".mp4");
-                        ca.src = ca.src.substring(0, pos);
-                        ca.src += "_B.mp4";
-                    }
-                } else {
-                    if (player.pageObj.multstream.indexOf("D") > 0 || player.pageObj.multstream.indexOf("d") > 0) {
-                        var pos = ca.src.lastIndexOf(".mp4");
-                        ca.src = ca.src.substring(0, pos);
-                        ca.src += "_D.mp4";
-                    } else if (player.pageObj.multstream.indexOf("B") > 0 || player.pageObj.multstream.indexOf("b") > 0) {
-                        var pos = ca.src.lastIndexOf(".mp4");
-                        ca.src = ca.src.substring(0, pos);
-                        ca.src += "_B.mp4";
+                if (curAd.multstream !== undefined) {
+                    if (bMobile) {
+                        if (curAd.multstream.indexOf("B") > 0 || curAd.multstream.indexOf("b") > 0) {
+                            var pos = ca.src.lastIndexOf(".mp4");
+                            ca.src = ca.src.substring(0, pos);
+                            ca.src += "_B.mp4";
+                        }
+                    } else {
+                        if (curAd.multstream.indexOf("D") > 0 || curAd.multstream.indexOf("d") > 0) {
+                            var pos = ca.src.lastIndexOf(".mp4");
+                            ca.src = ca.src.substring(0, pos);
+                            ca.src += "_D.mp4";
+                        } else if (curAd.multstream.indexOf("B") > 0 || curAd.multstream.indexOf("b") > 0) {
+                            var pos = ca.src.lastIndexOf(".mp4");
+                            ca.src = ca.src.substring(0, pos);
+                            ca.src += "_B.mp4";
+                        }
                     }
                 }
             }
