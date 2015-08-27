@@ -241,7 +241,7 @@
 
                 // delay a bit and then check again unless we're out of attempts
                 if (attempts--) {
-                    setTimeout(tryToResume, 100);
+                    setTimeout(tryToResume, 50);
                 }
             },
 
@@ -286,10 +286,7 @@
               player.load();
               // and then resume from the snapshots time once the original src has loaded
               player.one('loadedmetadata', tryToResume);
-              // for rtmp by paul
-              //if (player.techName === 'Flash')
-              if (player.Ua === 'Flash')
-                  tryToResume();
+              //tryToResume();
               //  // for rtmp by paul
               //if (player.paused())
               //    player.play();
@@ -337,6 +334,7 @@
           // when truthy, instructs the plugin to output additional information about
           // plugin state to the video.js log. On most devices, the video.js log is
           // the same as the developer console.
+          //debug: true
           debug: false
       },
 

@@ -18,12 +18,22 @@ function ActionStat(act) {
 function SetPageinfo(pinfo) {
     var player = videojs("example_video_1");
     player.setinfo(pinfo);
+console.log("page info: " + JSON.stringify(pinfo));
     // quality selector
     player.resolutionSelector();
 }
 
 (function (window, document, vjs, undefined) {
     "use strict";
+    
+    var enableSkip = true;
+    var bMobile = false;
+    var gSetting;
+
+    function canPlayAd() {
+        return gSetting.campOnAir && Math.floor(Math.random() * 100) <= gSetting.percentage;
+    }
+
     function EncryptByDES(message, key) {
         var encrypted = CryptoJS.DES.encrypt(CryptoJS.enc.Utf8.parse(message), CryptoJS.enc.Utf8.parse(key), { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.ZeroPadding });
 
@@ -118,7 +128,7 @@ function SetPageinfo(pinfo) {
         // HAVE_NOTHING -- 0
         if (this.player().readyState() === 0) return;
         //console.log("ready state: " + this.player().readyState());
-        if (state.adPlaying && curAd !== undefined) {
+        if (state.adPlaying && curAd !== undefined && !bMobile) {
             if (curAd.link)
                 //window.open(curAd.link, '_blank');
             {
@@ -143,10 +153,10 @@ function SetPageinfo(pinfo) {
         }
     };
 
-    // try to forbid right click
-    videojs.oncontextmenu = function () {
-        return false;
-    }
+    //// try to forbid right click
+    //videojs.oncontextmenu = function () {
+    //    return false;
+    //}
 
     /**
      * Add a skip button for the Ads Plugin
@@ -185,7 +195,7 @@ function SetPageinfo(pinfo) {
         //ChangePlayerSource("/XpIMmZkJJIUF1vCVQWuvdJNtKrPasb1S4vEVoX%2BNWq/5MTVXN0dVyjG%2BqE7ixs0rtvEwerd0iM=", "rtmp/flv");
         //player.change("http://vjs.zencdn.net/v/oceans.mp4", "video/mp4");
         player.ads.endLinearAdMode();
-        //state.adPlaying = false;
+        state.adPlaying = false;
         // replace(/(?:^|\s)MyClass(?!\S)/g , '');vjs-ad-enable-skip
         //player.el().className = player.el().className.replace(/(?:^|\s)vjs-ad-enable-skip(?!\S)/g, "");
         //console.log("*** skip button clicked, disable skip: " + player.el().className);
@@ -198,6 +208,7 @@ function SetPageinfo(pinfo) {
     state.adPlaying = false;
     var userToken;
     var curAd = {};
+    var midrollList = [];
 
     /**
      * Register the ad integration plugin.
@@ -206,12 +217,55 @@ function SetPageinfo(pinfo) {
      * @param {mixed} options Hash of obtions for the videojs-ads plugin.
      */
     vjs.plugin('regAds', function (options) {
-
         // check cookie
         // if not exist..
         userToken = getCookie("kec_token");
 
+        // get global parameters
+        var getGlobalParameter = function () {
+            try {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "http://206.190.131.92:6008/GetGlobalSetting.ashx");
+                xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        try {
+                            gSetting = JSON.parse(xhr.responseText);
 
+                            try {
+                                if (player.pageObj.Monietized.toUpperCase() === "disabled".toUpperCase())
+                                    gSetting.campOnAir = false;
+                            } catch (err) {
+                            }
+                            //gSetting.campOnAir = false;
+
+                            // requestAds must call after gSetting has value
+                            try {
+                                // request ad inventory whenever the player gets new content to play
+                                //player.on('contentupdate', requestAds);
+                                player.one('contentupdate', requestAds);
+                                // if there's already content loaded, request an add immediately
+                                if (player.currentSrc()) {
+                                    requestAds();
+                                }
+                            } catch (err) {
+                                throw new Error('Couldn\'t parse inventory response as JSON');
+                            }
+
+                        } catch (err) {
+                            throw new Error('Couldn\'t parse global setting response as JSON');
+                        }
+                    }
+                };
+                xhr.send();
+            }
+            catch (err) {
+                throw new Error('get global setting error.');
+            }
+        };
+
+        //getGlobalParameter();
+        // fingerprint (if success will call requestAds)
         var bi = get_browser_info();
         var ua = detect.parse(navigator.userAgent);
         //console.log(bi.name.toString() + '-' + bi.version.toString());
@@ -240,7 +294,18 @@ function SetPageinfo(pinfo) {
             uploadObj.platform = fp.platformKey().toString().replace("navigatorPlatform: ", "");
             //uploadObj.device = ua.device.name == undefined ? ua.device.type : ua.device.name;
             uploadObj.device = ua.device.type;
+            if (uploadObj.device.toUpperCase() === "Desktop".toUpperCase()) {
+                bMobile = false;
+            } else
+                bMobile = true;
             uploadObj.os = ua.os.name;
+
+            var player = videojs("example_video_1");
+
+            if (uploadObj.os.indexOf("Android") >= 0)
+                player.removeClass("vjs-not-android");
+            else
+                player.addClass("vjs-not-android");
 
             if (userToken !== result) {
                 userToken = result;
@@ -269,22 +334,22 @@ function SetPageinfo(pinfo) {
             //xhr.setRequestHeader("Connection", "close");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    try {
-                        // request ad inventory whenever the player gets new content to play
-                        player.on('contentupdate', requestAds);
-                        //player.one('contentupdate', requestAds);
-                        // if there's already content loaded, request an add immediately
-                        if (player.currentSrc()) {
-                            requestAds();
-                        }
-                    } catch (err) {
-                        throw new Error('Couldn\'t parse inventory response as JSON');
-                    }
+                    getGlobalParameter();
+                    //try {
+                    //    // request ad inventory whenever the player gets new content to play
+                    //    player.on('contentupdate', requestAds);
+                    //    //player.one('contentupdate', requestAds);
+                    //    // if there's already content loaded, request an add immediately
+                    //    if (player.currentSrc()) {
+                    //        requestAds();
+                    //    }
+                    //} catch (err) {
+                    //    throw new Error('Couldn\'t parse inventory response as JSON');
+                    //}
                 }
             };
             xhr.send(params);
         });
-
 
 
         // add skip button
@@ -307,6 +372,8 @@ function SetPageinfo(pinfo) {
         // asynchronous method for requesting ad inventory
         requestAds = function () {
 
+            if (!gSetting.campOnAir)
+                return false;
             // reset plugin state
             //state = {};
             // fetch ad inventory
@@ -327,12 +394,22 @@ function SetPageinfo(pinfo) {
             //var adi = {};
             //adi.type_ads = 1;
             
-            // network... 
-            for (var idx = 0; idx < player.pageObj.whitelist.length; idx++) {
-                adi.tgt_network.network.push(player.pageObj.whitelist[idx]);
+            //// network... 
+            try {
+                if (player.pageObj.Monietized.toUpperCase() !== "AllowedAll".toUpperCase()) {
+                    for (var idx = 0; idx < player.pageObj.whitelist.length; idx++) {
+                        adi.tgt_network.network.push(player.pageObj.whitelist[idx]);
+                    }
+                } else {
+                    adi.tgt_network.network.push("all");
+                    adi.tgt_network.network.push(player.pageObj.account);
+                }
+            } catch (err) {
+
             }
             
             var params = JSON.stringify(adi);
+
             //xhr.open("POST", "http://localhost:51209/GetList.ashx", true);
             xhr.open("POST", "http://206.190.131.92:6008/GetList.ashx", true);
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -343,6 +420,24 @@ function SetPageinfo(pinfo) {
                         if (!state.inventory.pre)
                             return;
                         player.trigger('adsready');
+
+                        //// set cue points?
+                        //player.addCuepoint({
+                        //    namespace: "logger",
+                        //    start: 0,
+                        //    end: 30,
+                        //    onStart: function(params){
+                        //        if(params.error){
+                        //            console.error("Error at second 0");
+                        //        }else{
+                        //            console.log("Log at second 0");
+                        //        }
+                        //    },
+                        //    onEnd: function(params){
+                        //        console.log("Action ends at second 30");
+                        //    },
+                        //    params: {error: false}
+                        //});
                     } catch (err) {
                         throw new Error('Couldn\'t parse inventory response as JSON');
                     }
@@ -352,9 +447,39 @@ function SetPageinfo(pinfo) {
             xhr.send(params);
         },
 
+        genMidrollList = function () {
+            //player.trigger('adsready');
+
+            midrollList = [];
+            var duration = player.duration();
+            // for android m3u8 duration returen 0... cannot show live..
+            if (duration === Infinity || duration <= 0) {
+                this.addClass('vjs-live');
+            } else {
+                this.removeClass('vjs-live');
+            }
+
+            if (state.adPlaying || gSetting === undefined || gSetting.timeInterval <= 0)
+                return;
+            //if (state.preroll || state.midroll) {
+            if (duration < 0 || duration === Infinity)
+                return;
+            var t = gSetting.timeInterval + gSetting.timeInterval / 2;
+                while (t <= duration) {
+                if ((t - gSetting.timeInterval / 2) > 0 && (t - gSetting.timeInterval / 2) % gSetting.timeInterval == 0) {
+                        midrollList.push(t);
+                    }
+                t += gSetting.timeInterval;
+                }
+            //}
+        },
+
         // play an ad, given an opportunity
         playAd = function () {
 
+            // added by paul
+            if (!canPlayAd())
+                return;
             // short-circuit if we don't have any ad inventory to play
             if (!state.inventory || (!state.preroll && !state.midroll)) {
                 return;
@@ -365,28 +490,54 @@ function SetPageinfo(pinfo) {
                     return;
             }
 
+            // modified by paul now all mid roll use preroll ads.. 
+            //if (state.midroll) {
+            //    if (state.inventory.mid === undefined || state.inventory.midroll.length === 0)
+            //        return;
+            //}
             if (state.midroll) {
-                if (state.inventory.mid === undefined || state.inventory.midroll.length === 0)
+                if (state.inventory.pre === undefined || state.inventory.pre.length === 0)
                     return;
+            }
+
+            var ca = {};
+            if (state.preroll || state.midroll) {
+                curAd = state.inventory.pre[Math.floor(Math.random() * state.inventory.pre.length)];
+                ca.src = curAd.src;
+                ca.type = curAd.type;
+                if (bMobile) {
+                    if (player.pageObj.multstream.indexOf("B") > 0 || player.pageObj.multstream.indexOf("b") > 0) {
+                        var pos = ca.src.lastIndexOf(".mp4");
+                        ca.src = ca.src.substring(0, pos);
+                        ca.src += "_B.mp4";
+                    }
+                } else {
+                    if (player.pageObj.multstream.indexOf("D") > 0 || player.pageObj.multstream.indexOf("d") > 0) {
+                        var pos = ca.src.lastIndexOf(".mp4");
+                        ca.src = ca.src.substring(0, pos);
+                        ca.src += "_D.mp4";
+                    } else if (player.pageObj.multstream.indexOf("B") > 0 || player.pageObj.multstream.indexOf("b") > 0) {
+                        var pos = ca.src.lastIndexOf(".mp4");
+                        ca.src = ca.src.substring(0, pos);
+                        ca.src += "_B.mp4";
+                    }
+                }
             }
 
             // tell ads plugin we're ready to play our ad
             player.ads.startLinearAdMode();
             state.adPlaying = true;
 
-            if (state.preroll) {
-                curAd = state.inventory.pre[Math.floor(Math.random() * state.inventory.pre.length)];
-            }
             //else {
             //    // curAd already got in 'timeupdate'
             //}
             // tell videojs to load the ad
 
-            if (curAd === undefined) {
+            if (ca === undefined) {
                 console.log('Couldn\'t parse inventory response as JSON');
                 return;
             }
-            player.src(curAd);
+            player.src(ca);
 
             // when the video metadata is loaded, play it!
             player.one('durationchange', function () {
@@ -395,11 +546,12 @@ function SetPageinfo(pinfo) {
 
             // when it's finished
             player.one('ended', function () {
+            //player.one('adended', function () {
                 // play your linear ad content, then when it's finished ...
                 player.ads.endLinearAdMode();
                 //player.el().className = player.el().className.replace(/(?:^|\s)vjs-ad-enable-skip(?!\S)/g, "");
                 //console.log("*** ads end, disable skip: " + player.el().className);
-                //state.adPlaying = false;
+                state.adPlaying = false;
                 //console.log("adPlaying set to false in event 'ended'.");
             });
             player.stat(3);
@@ -415,7 +567,10 @@ function SetPageinfo(pinfo) {
 
         // initialize the ads plugin, passing in any relevant options
         player.ads(options);
-
+        // forbidden right click
+        player.on('contextmenu', function (e) {
+            e.preventDefault();
+        });
         var changesrc = function (s, t) {
             if (s && t) {
                 console.log("change src.");
@@ -430,9 +585,10 @@ function SetPageinfo(pinfo) {
         var changestatus = function (s) {
             state.adPlaying = s;
             if (s === false) {
-                player.el().className = player.el().className.replace(/(?:^|\s)vjs-ad-enable-skip(?!\S)/g, "");
+                //player.el().className = player.el().className.replace(/(?:^|\s)vjs-ad-enable-skip(?!\S)/g, "");
+                player.removeClass("vjs-ad-enable-skip");
             }
-        }
+        };
 
         var actstat = function (act) {
             if (curAd === undefined || userToken === undefined)
@@ -464,7 +620,7 @@ function SetPageinfo(pinfo) {
             //    }
             //};
             xhr.send(strStat);
-        }
+        };
 
         var setpageinfo = function (pageinfo) {
             try {
@@ -473,13 +629,16 @@ function SetPageinfo(pinfo) {
                 player.pageObj = JSON.parse(pageinfo);
                 else if (typeof pageinfo == "object")
                 player.pageObj = pageinfo;
-		
-		// to be continued..
+                //try {
+                //    if (player.pageObj.Monietized.toUpperCase() === "disabled".toUpperCase())
+                //        gSetting.campOnAir = false;
+                //} catch (err) {
+                //    console.log(err.message);
+                //}
             } catch (err) {
-                throw new Error('Couldn\'t parse inventory response as JSON');
+                throw new Error('Couldn\'t parse pageinfo response as JSON');
             }
-        }
-
+        };
         // vjs.plugin('ads', adFramework);
         vjs.plugin('change', changesrc);
         vjs.plugin('changestatus', changestatus);
@@ -493,6 +652,9 @@ function SetPageinfo(pinfo) {
         //if (player.currentSrc()) {
         //    requestAds();
         //}
+
+        // if not ad, then generate the list .
+        player.on('loadedmetadata', genMidrollList);
 
         // play an ad the first time there's a preroll opportunity
         player.on('readyforpreroll', function () {
@@ -515,18 +677,19 @@ function SetPageinfo(pinfo) {
             //console.log("currentTime: " + currentTime + " ###");
             if ('lastTime' in state) {
                 //opportunity = currentTime > 15 && state.lastTime < 15;
-                if (state.adPlaying)
-                    opportunity_show_skip = currentTime > 3;
+                if (state.adPlaying && enableSkip)
+                    opportunity_show_skip = currentTime > gSetting.timeToShowSkip;
             }
             else
                 state.lastTime = 0;
             if (state.adPlaying) {
                 if (opportunity_show_skip) {
-                    var sName = player.el().className.toString();
-                    if (sName.indexOf("vjs-ad-enable-skip") == -1) {
-                        player.el().className += ' vjs-ad-enable-skip';
-                        //console.log("*** enable skip: " + player.el().className);
-                    }
+                    player.addClass("vjs-ad-enable-skip");
+                    //var sName = player.el().className.toString();
+                    //if (sName.indexOf("vjs-ad-enable-skip") == -1) {
+                    //    player.el().className += ' vjs-ad-enable-skip';
+                    //    //console.log("*** enable skip: " + player.el().className);
+                    //}
                 }
                 //else
                 //    //player.ads.removeClass(player.el(), 'vjs-ad-enable-skip');
@@ -549,18 +712,34 @@ function SetPageinfo(pinfo) {
                 if (state.lastTime === 0)
                     console.log("state.lastTime: " + state.lastTime + " ***");
                 //console.log("state.lastTime: " + state.lastTime + " ***");
+
+                //////////////////////////////////////////
+                // modified by paul now all use pre,
+                //var i = 0;
+                //if (!state.inventory || !state.inventory.mid)
+                //    return;
+                //for (i = 0; i < state.inventory.mid.length; i++) {
+                //    if (state.inventory.mid[i].ads_time == state.lastTime) {
+                //        curAd = state.inventory.mid[i];
+                //        state.midroll = true;
+                //        state.preroll = false;
+                //        //console.log("midroll at :" + state.lastTime + ", curtime: " + currentTime);
+                //        playAd();
+                //    }
+                //}
+                /////////////////////////////////////////////////////
+
+                // use cuepoint what about drag...
                 var i = 0;
-		if (!state.inventory || !state.inventory.mid)
-                    return;
-                for (i = 0; i < state.inventory.mid.length; i++) {
-                    if (state.inventory.mid[i].ads_time == state.lastTime) {
-                        curAd = state.inventory.mid[i];
+                for (i = 0; i < midrollList.length; i++) {
+                    if (midrollList[i] == state.lastTime) {
                         state.midroll = true;
                         state.preroll = false;
                         //console.log("midroll at :" + state.lastTime + ", curtime: " + currentTime);
                         playAd();
                     }
                 }
+
             }
             //else
             //    //
