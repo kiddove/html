@@ -1,0 +1,5 @@
+I:\work\web\ADSS\ADSS\bin\ADSS.dll
+I:\work\web\ADSS\ADSS\bin\ADSS.pdb
+I:\work\web\ADSS\ADSS\obj\Debug\ADSS.dll
+I:\work\web\ADSS\ADSS\obj\Debug\ADSS.pdb
+I:\work\web\ADSS\ADSS\obj\Debug\ADSS.csprojResolveAssemblyReference.cache

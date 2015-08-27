@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit http://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <LastUsedBuildConfiguration>Debug</LastUsedBuildConfiguration>
+    <LastUsedPlatform>Any CPU</LastUsedPlatform>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="Actstat.ashx">
+      <publishTime>05/21/2015 09:32:32</publishTime>
+    </File>
+    <File Include="Apply.aspx">
+      <publishTime>04/28/2015 12:08:05</publishTime>
+    </File>
+    <File Include="bin/ADSS.dll">
+      <publishTime>08/27/2015 16:34:32</publishTime>
+    </File>
+    <File Include="bin/ADSS.pdb">
+      <publishTime>08/27/2015 16:34:32</publishTime>
+    </File>
+    <File Include="FingerPrint.ashx">
+      <publishTime>04/05/2015 13:15:34</publishTime>
+    </File>
+    <File Include="GetGlobalSetting.ashx">
+      <publishTime>08/12/2015 13:52:04</publishTime>
+    </File>
+    <File Include="GetList.ashx">
+      <publishTime>04/05/2015 15:44:21</publishTime>
+    </File>
+    <File Include="GetList.aspx">
+      <publishTime>05/01/2015 17:18:25</publishTime>
+    </File>
+    <File Include="Retrieve.ashx">
+      <publishTime>05/05/2015 16:41:46</publishTime>
+    </File>
+    <File Include="Submit.ashx">
+      <publishTime>01/05/2015 18:06:25</publishTime>
+    </File>
+    <File Include="Web.config">
+      <publishTime>08/27/2015 16:35:49</publishTime>
+    </File>
+  </ItemGroup>
+</Project>

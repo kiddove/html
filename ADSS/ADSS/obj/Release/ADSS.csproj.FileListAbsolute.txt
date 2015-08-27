@@ -1,0 +1,5 @@
+I:\work\web\ADSS\ADSS\bin\ADSS.dll
+I:\work\web\ADSS\ADSS\bin\ADSS.pdb
+I:\work\web\ADSS\ADSS\obj\Release\ADSS.csprojResolveAssemblyReference.cache
+I:\work\web\ADSS\ADSS\obj\Release\ADSS.dll
+I:\work\web\ADSS\ADSS\obj\Release\ADSS.pdb

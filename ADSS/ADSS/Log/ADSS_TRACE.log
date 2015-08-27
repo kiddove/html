@@ -1,0 +1,143 @@
+05/05/2015 10:46:05 AM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 10:46:35 AM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 10:46:51 AM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 10:48:04 AM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 10:48:16 AM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 10:53:37 AM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 11:28:33 AM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 11:28:59 AM 5208 FingerPrint.ashx 192.168.9.50 Exception in Deserialize(): Invalid JSON primitive: myParam.
+05/05/2015 11:30:52 AM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 11:33:04 AM 5208 FingerPrint.ashx 192.168.9.50 client IP: 192.168.9.50
+05/05/2015 11:33:28 AM 5208 FingerPrint.ashx 192.168.9.50 Exception in sql tracsaction: Incorrect syntax near '.9'.
+05/05/2015 11:35:03 AM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 11:36:04 AM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 11:36:55 AM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 11:37:05 AM 5208 FingerPrint.ashx 192.168.9.50 client IP: 192.168.9.50
+05/05/2015 11:38:57 AM 5208 FingerPrint.ashx 192.168.9.50 Exception in sql tracsaction: Incorrect syntax near '.9'.
+05/05/2015 11:39:57 AM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 11:40:01 AM 5208 FingerPrint.ashx 192.168.9.50 client IP: 192.168.9.50
+05/05/2015 11:42:26 AM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 11:42:26 AM 5208 FingerPrint.ashx 192.168.9.50 client IP: 192.168.9.50
+05/05/2015 11:42:38 AM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 11:43:41 AM 5208 FingerPrint.ashx 192.168.9.50 client IP: 192.168.9.50
+05/05/2015 11:44:19 AM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 11:45:41 AM 5208 FingerPrint.ashx 192.168.9.50 Exception in Deserialize(): Invalid JSON primitive: myParam.
+05/05/2015 12:16:44 PM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 12:16:56 PM 5208 FingerPrint.ashx 192.168.9.50 client IP: 192.168.9.50
+05/05/2015 12:17:06 PM 5208 FingerPrint.ashx 192.168.9.50 Exception in InsertUserInfo(): Incorrect syntax near '192.168'.
+Unclosed quotation mark after the character string ''.
+05/05/2015 12:17:24 PM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 12:17:27 PM 5208 FingerPrint.ashx 192.168.9.50 client IP: 192.168.9.50
+05/05/2015 12:17:41 PM 5208 FingerPrint.ashx 192.168.9.50 Exception in InsertUserInfo(): Incorrect syntax near '192.168'.
+Unclosed quotation mark after the character string ''.
+05/05/2015 12:18:23 PM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 12:18:33 PM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 12:19:05 PM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 12:23:12 PM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 12:23:24 PM 5208 FingerPrint.ashx 192.168.9.50 client IP: 192.168.9.50
+05/05/2015 12:25:21 PM 5208 FingerPrint.ashx 192.168.9.50 Exception in InsertUserInfo(): Incorrect syntax near the keyword 'table'.
+05/05/2015 1:02:48 PM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 1:02:58 PM 5208 FingerPrint.ashx 192.168.9.50 client IP: 192.168.9.50
+05/05/2015 1:04:41 PM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 1:04:44 PM 5208 FingerPrint.ashx 192.168.9.50 client IP: 192.168.9.50
+05/05/2015 1:05:12 PM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 1:05:16 PM 5208 FingerPrint.ashx 192.168.9.50 client IP: 192.168.9.50
+05/05/2015 1:05:27 PM 5208 FingerPrint.ashx 192.168.9.50 Exception in InsertUserInfo(): Incorrect syntax near the keyword 'table'.
+05/05/2015 1:08:01 PM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 1:08:05 PM 5208 FingerPrint.ashx 192.168.9.50 client IP: 192.168.9.50
+05/05/2015 1:11:57 PM 5208 FingerPrint.ashx  client IP: 192.168.9.50
+05/05/2015 1:12:22 PM 5208 FingerPrint.ashx 192.168.9.50 client IP: 192.168.9.50
+{"pre":[],"mid":[{"id":4,"source":"http://localhost/demo/samples/kitteh.mp4","ads_type":2,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20},{"id":5,"source":"http://localhost/demo/samples/i8.mp4","ads_type":2,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20}],"display_big":[],"display_small":[]}
+{"pre":[],"mid":[{"id":4,"source":"http://localhost/demo/samples/kitteh.mp4","ads_type":2,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20},{"id":5,"source":"http://localhost/demo/samples/i8.mp4","ads_type":2,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20}],"display_big":[],"display_small":[]}
+{"pre":[],"mid":[{"id":4,"source":"http://localhost/demo/samples/kitteh.mp4","ads_type":2,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20},{"id":5,"source":"http://localhost/demo/samples/i8.mp4","ads_type":2,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20}],"display_big":[],"display_small":[]}
+{"pre":[],"mid":[{"id":4,"source":"http://localhost/demo/samples/kitteh.mp4","ads_type":2,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20},{"id":5,"source":"http://localhost/demo/samples/i8.mp4","ads_type":2,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20}],"display_big":[],"display_small":[]}
+{"pre":[{"id":6,"source":"http://localhost/demo/samples/cla.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20},{"id":7,"source":"http://localhost/demo/samples/superclip.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20}],"mid":[],"display_big":[],"display_small":[]}
+{"pre":[{"id":6,"source":"http://localhost/demo/samples/cla.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20},{"id":7,"source":"http://localhost/demo/samples/superclip.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20}],"mid":[],"display_big":[],"display_small":[]}
+{"pre":[{"id":6,"src":"http://localhost/demo/samples/cla.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20},{"id":7,"src":"http://localhost/demo/samples/superclip.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20}],"mid":[],"display_big":[],"display_small":[]}
+{"pre":[{"id":6,"src":"http://localhost/demo/samples/cla.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20},{"id":7,"src":"http://localhost/demo/samples/superclip.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20}],"mid":[],"display_big":[],"display_small":[]}
+{"pre":[{"id":6,"src":"http://localhost/demo/samples/cla.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20},{"id":7,"src":"http://localhost/demo/samples/superclip.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20}],"mid":[],"display_big":[],"display_small":[]}
+{"pre":[{"id":6,"src":"http://localhost/demo/samples/cla.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20},{"id":7,"src":"http://localhost/demo/samples/superclip.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20}],"mid":[],"display_big":[],"display_small":[]}
+Incorrect syntax near 'where'.
+{"pre":[{"id":6,"src":"http://localhost/demo/samples/cla.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20},{"id":7,"src":"http://localhost/demo/samples/superclip.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20}],"mid":[],"display_big":[],"display_small":[]}
+Type 'System.Byte' is not supported for deserialization of an array.
+Incorrect syntax near 'where'.
+Type 'System.Byte' is not supported for deserialization of an array.
+{"pre":[{"id":6,"src":"http://localhost/demo/samples/cla.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20},{"id":7,"src":"http://localhost/demo/samples/superclip.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20}],"mid":[],"display_big":[],"display_small":[]}
+No parameterless constructor defined for type of 'ADSS.AdsInfo[]'.
+Type 'ADSS.AdsInfo' is not supported for deserialization of an array.
+Type 'ADSS.GetListCondition' is not supported for deserialization of an array.
+Incorrect syntax near '='.
+Incorrect syntax near '='.
+{"pre":[{"id":7,"src":"http://localhost/demo/samples/superclip.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":20}],"mid":[],"display_big":[],"display_small":[]}
+Cannot insert the value NULL into column 'network_id', table 'ADSS.dbo.tb_tgt_network'; column does not allow nulls. INSERT fails.
+The statement has been terminated.
+Cannot insert the value NULL into column 'network_id', table 'ADSS.dbo.tb_tgt_network'; column does not allow nulls. INSERT fails.
+The statement has been terminated.
+Cannot insert the value NULL into column 'network_id', table 'ADSS.dbo.tb_tgt_network'; column does not allow nulls. INSERT fails.
+The statement has been terminated.
+Cannot insert the value NULL into column 'location_code', table 'ADSS.dbo.tb_tgt_location'; column does not allow nulls. INSERT fails.
+The statement has been terminated.
+Cannot insert the value NULL into column 'location_code', table 'ADSS.dbo.tb_tgt_location'; column does not allow nulls. INSERT fails.
+The statement has been terminated.
+Cannot insert the value NULL into column 'location_code', table 'ADSS.dbo.tb_tgt_location'; column does not allow nulls. INSERT fails.
+The statement has been terminated.
+Cannot insert the value NULL into column 'location_code', table 'ADSS.dbo.tb_tgt_location'; column does not allow nulls. INSERT fails.
+The statement has been terminated.
+Cannot insert duplicate key row in object 'dbo.tb_ads_info' with unique index 'idx_source_type'. The duplicate key value is (http://localhost/demo/samples/i8.mp4, 1).
+The statement has been terminated.
+Input string was not in a correct format.
+Cannot insert duplicate key row in object 'dbo.tb_ads_info' with unique index 'idx_source_type'. The duplicate key value is (http://localhost/demo/samples/i8.mp4, 1).
+The statement has been terminated.
+Input string was not in a correct format.
+Input string was not in a correct format.
+Input string was not in a correct format.
+Cannot insert duplicate key row in object 'dbo.tb_ads_info' with unique index 'idx_source_type'. The duplicate key value is (http://localhost/demo/samples/i8.mp4, 1).
+The statement has been terminated.
+Incorrect syntax near '='.
+Cannot convert object of type 'System.Int32' to type 'System.Collections.Generic.List`1[System.Int32]'
+{"pre":[],"mid":[],"display_big":[],"display_small":[]}
+{"id":10,"source":"http://localhost/demo/samples/i8.mp4","type_ads":1,"type_video_media":"video/mp4","click_reference":"http://wwww.kdlinx.com","time_to_play_video_ads":0,"src_account":"kiddove@gmail.com","camp_start_date":"28/04/2015 12:00:00 AM","camp_stop_date":"28/04/2016 12:00:00 AM","camp_status":1,"tgt_location":{"country":[]},"tgt_network":{"network":["all"]},"tgt_device":{"device":["all"]},"tgt_language":{"language":["all"]}}
+Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+{"id":10,"source":"http://localhost/demo/samples/i8.mp4","type_ads":1,"type_video_media":"video/mp4","click_reference":"http://wwww.kdlinx.com","time_to_play_video_ads":0,"src_account":"kiddove@gmail.com","camp_start_date":"28/04/2015 12:00:00 AM","camp_stop_date":"28/04/2016 12:00:00 AM","camp_status":1,"tgt_location":{"country":[{"name":"canada","province":[{"name":"all","city":["all"]}]}]},"tgt_network":{"network":["all"]},"tgt_device":{"device":["all"]},"tgt_language":{"language":["all"]}}
+{"tgt_network":{"network":["rogers","bell"]},"tgt_device":{"device":["all"]},"tgt_language":{"language":["mandarin","english"]},"id":8,"source":"http://localhost/demo/samples/superclip.mp4","type_ads":1,"type_video_media":"video/mp4","click_reference":"http://wwww.wyslink.com","time_to_play_video_ads":0,"src_account":"kiddove@gmail.com","camp_start_date":"28/04/2015 12:00:00 AM","camp_stop_date":"28/04/2016 12:00:00 AM","camp_status":1,"tgt_location":{"country":[{"name":"canada","province":[{"name":"ontario","city":["markham","richmondhill","toronto","montreal","beijing"]},{"name":"quebec","city":["ottawa"]},{"name":"beijing","city":[]}]},{"name":"china","province":[]}]}}
+{"id":8,"source":"http://localhost/demo/samples/superclip.mp4","type_ads":1,"type_video_media":"video/mp4","click_reference":"http://wwww.wyslink.com","time_to_play_video_ads":0,"src_account":"kiddove@gmail.com","camp_start_date":"28/04/2015 12:00:00 AM","camp_stop_date":"28/04/2016 12:00:00 AM","camp_status":1,"tgt_location":{"country":[{"name":"canada","province":[{"name":"ontario","city":["markham","richmondhill","toronto","montreal","beijing"]},{"name":"quebec","city":["ottawa"]},{"name":"beijing","city":[]}]},{"name":"china","province":[]}]},"tgt_network":{"network":["rogers","bell"]},"tgt_device":{"device":["all"]},"tgt_language":{"language":["mandarin","english"]}}
+Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+{"id":8,"source":"http://localhost/demo/samples/superclip.mp4","type_ads":1,"type_video_media":"video/mp4","click_reference":"http://wwww.wyslink.com","time_to_play_video_ads":0,"src_account":"kiddove@gmail.com","camp_start_date":"28/04/2015 12:00:00 AM","camp_stop_date":"28/04/2016 12:00:00 AM","camp_status":1,"tgt_location":{"country":[{"name":"canada","province":[{"name":"ontario","city":["markham","richmondhill","toronto"]},{"name":"quebec","city":["montreal","ottawa"]}]},{"name":"china","province":[{"name":"beijing","city":["beijing"]}]}]},"tgt_network":{"network":["rogers","bell"]},"tgt_device":{"device":["all"]},"tgt_language":{"language":["mandarin","english"]}}
+{"id":8,"source":"http://localhost/demo/samples/superclip.mp4","type_ads":1,"type_video_media":"video/mp4","click_reference":"http://wwww.wyslink.com","time_to_play_video_ads":0,"src_account":"kiddove@gmail.com","camp_start_date":"28/04/2015 12:00:00 AM","camp_stop_date":"28/04/2016 12:00:00 AM","camp_status":1,"tgt_location":{"country":[{"name":"canada","province":[{"name":"ontario","city":["markham","richmondhill","toronto"]},{"name":"quebec","city":["montreal","ottawa"]}]},{"name":"china","province":[{"name":"beijing","city":["beijing"]}]}]},"tgt_network":{"network":["rogers","bell"]},"tgt_device":{"device":["all"]},"tgt_language":{"language":["mandarin","english"]}}
+An expression of non-boolean type specified in a context where a condition is expected, near 'id'.
+An expression of non-boolean type specified in a context where a condition is expected, near 'id'.
+{"pre":[{"id":8,"src":"http://localhost/demo/samples/superclip.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":0},{"id":10,"src":"http://localhost/demo/samples/i8.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.kdlinx.com","ads_time":0}],"mid":[],"display_big":[],"display_small":[]}
+{"pre":[{"id":10,"src":"http://localhost/demo/samples/i8.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.kdlinx.com","ads_time":0}],"mid":[],"display_big":[],"display_small":[]}
+{"pre":[{"id":10,"src":"http://localhost/demo/samples/i8.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.kdlinx.com","ads_time":0}],"mid":[],"display_big":[],"display_small":[]}
+{"pre":[{"id":10,"src":"http://localhost/demo/samples/i8.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.kdlinx.com","ads_time":0}],"mid":[],"display_big":[],"display_small":[]}
+{"pre":[{"id":8,"src":"http://localhost/demo/samples/superclip.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.wyslink.com","ads_time":0},{"id":10,"src":"http://localhost/demo/samples/i8.mp4","ads_type":1,"type":"video/mp4","link":"http://wwww.kdlinx.com","ads_time":0}],"mid":[],"display_big":[],"display_small":[]}
+20150507101151, 6068, Exception in InsertUserInfo(): Conversion failed when converting date and/or time from character string.
+20150507101310, 6068, Exception in InsertUserInfo(): Conversion failed when converting date and/or time from character string.
+2015-05-07 11:14:03, 6060, Exception in InsertUserInfo(): Invalid column name 'platform'.
+2015-05-07 11:14:03, 6060, Exception in InsertUserInfo(): Invalid column name 'platform'.
+2015-05-07 11:14:03, 6060, Exception in InsertUserInfo(): Invalid column name 'platform'.
+2015-05-07 11:15:03, 6060, Exception in InsertUserInfo(): Invalid column name 'platform'.
+2015-05-07 11:15:18, 6060, Exception in InsertUserInfo(): Invalid column name 'platform'.
+2015-05-07 11:15:46, 6060, Exception in InsertUserInfo(): Invalid column name 'platform'.
+2015-05-07 11:19:14, 6060, Exception in InsertUserInfo(): Invalid column name 'platform'.
+There are more columns in the INSERT statement than values specified in the VALUES clause. The number of values in the VALUES clause must match the number of columns specified in the INSERT statement.
+2015-05-07 11:20:13, 6060, Exception in InsertUserInfo(): Invalid column name 'platform'.
+2015-05-07 11:21:13, 6060, Exception in InsertUserInfo(): Invalid column name 'platform'.
+2015-05-13 14:18:22, 7380, Submit Exception: Cannot insert duplicate key row in object 'dbo.tb_ads_info' with unique index 'idx_source_type'. The duplicate key value is (http://173.236.36.10/cds/samples/small.jpg, 4).
+The statement has been terminated.
+2015-05-13 14:35:23, 7380, Submit Exception: The conversion of a varchar data type to a datetime data type resulted in an out-of-range value.
+The statement has been terminated.
+2015-05-13 14:37:04, 7380, Submit Exception: Conversion failed when converting date and/or time from character string.
+2015-05-13 15:41:44, 7380, SpecificFilter.GetList() --- Exception: Incorrect syntax near ';'.
+2015-07-15 10:25:05, 1236, GetList json parameter: {"tgt_network":{"network":["all"]},"tgt_device":{"device":["all"]},"tgt_language":{"language":["all"]},"id":8,"source":"http://173.236.36.10/cds/samples/small.jpg","type_ads":4,"type_video_media":"jpg","click_reference":"http://www.wyslink.com","time_to_play_video_ads":0,"src_account":"kiddove@gmail.com","camp_start_date":"2015-04-28 00:00:00","camp_stop_date":"2016-04-28 00:00:00","camp_status":1,"tgt_location":{"country":[{"name":"canada","province":[{"name":"aLl","city":["all"]}]}]}}
+2015-07-15 10:26:31, 1236, GetList json parameter: {"tgt_network":{"network":["all"]},"tgt_device":{"device":["all"]},"tgt_language":{"language":["all"]},"id":8,"source":"http://173.236.36.10/cds/samples/small.jpg","type_ads":4,"type_video_media":"jpg","click_reference":"http://www.wyslink.com","time_to_play_video_ads":0,"src_account":"kiddove@gmail.com","camp_start_date":"2015-04-28 00:00:00","camp_stop_date":"2016-04-28 00:00:00","camp_status":1,"tgt_location":{"country":[{"name":"canada","province":[{"name":"aLl","city":["all"]}]}]}}
+2015-07-15 10:28:20, 1236, GetList json parameter: {"tgt_network":{"network":["all"]},"tgt_device":{"device":["all"]},"tgt_language":{"language":["all"]},"id":1}
+2015-07-15 10:31:26, 1236, GetList json parameter: {}
+2015-07-15 10:31:48, 1236, SpecificFilter.GetList() --- Exception: Incorrect syntax near 'and'.
+2015-07-15 10:32:17, 1236, GetList json parameter: {}
+2015-07-15 10:32:58, 1236, SpecificFilter.GetList() --- Exception: Incorrect syntax near 'and'.
+2015-07-15 10:34:28, 1236, GetList json parameter: {}
+2015-07-15 10:35:38, 1236, GetList json parameter: {}
+2015-08-12 13:52:28, 7440, GetGlobalSetting.GetGlobalSettingFromDB() --- Exception: Invalid object name 'dbo.tb_global_setting'.
