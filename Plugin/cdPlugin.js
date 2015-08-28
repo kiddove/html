@@ -302,7 +302,10 @@ console.log("page info: " + JSON.stringify(pinfo));
 
             var player = videojs("example_video_1");
 
-            if (uploadObj.os.indexOf("Android") >= 0)
+            var isiPad = navigator.userAgent.match(/iPad/i) != null;
+
+            if (isiPad || uploadObj.os.indexOf("Android") >= 0)
+                //if (uploadObj.os.indexOf("Android") >= 0)
                 player.removeClass("vjs-not-android");
             else
                 player.addClass("vjs-not-android");
