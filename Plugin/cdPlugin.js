@@ -18,7 +18,7 @@ function ActionStat(act) {
 function SetPageinfo(pinfo) {
     var player = videojs("example_video_1");
     player.setinfo(pinfo);
-console.log("page info: " + JSON.stringify(pinfo));
+    console.log("page info: " + JSON.stringify(pinfo));
     // quality selector
     player.resolutionSelector();
 }
@@ -408,7 +408,8 @@ console.log("page info: " + JSON.stringify(pinfo));
                     adi.tgt_network.network.push(player.pageObj.account);
                 }
             } catch (err) {
-
+                // if setpageinfo failed or not called
+                adi.tgt_network.network.push("none");
             }
             
             var params = JSON.stringify(adi);
