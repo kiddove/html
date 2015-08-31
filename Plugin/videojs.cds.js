@@ -560,8 +560,10 @@
           // if you want to change the src of the video without triggering
           // the ad workflow to restart, you can update this variable before
           // modifying the player's source
-          player.ads.contentSrc = player.currentSrc();
-          player.ads.contentType = player.currentType();
+
+          // modified by paul, do not do it on 'loadstart', contentupdate will be trigger manually
+          //player.ads.contentSrc = player.currentSrc();
+          //player.ads.contentType = player.currentType();
 
           // implement 'contentupdate' event.
           (function () {
@@ -582,7 +584,8 @@
                     }
                 };
               // loadstart reliably indicates a new src has been set
-              player.on('loadstart', checkSrc);
+              // modified by paul, do not do it on 'loadstart', contentupdate will be trigger manually
+              //player.on('loadstart', checkSrc);
               // check immediately in case we missed the loadstart
               setImmediate(checkSrc);
           })();
