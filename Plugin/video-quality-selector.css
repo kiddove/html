@@ -6,14 +6,16 @@ are just basic styles to make it look ok with plain text.
 */
 
 /* Position the button */
-.vjs-res-button {
+.vjs-res-button
+{
 	float: left;
 	line-height: 3em;
 	width: 6em !important;
 }
 
 /* Don't show hover effects on title */
-ul li.vjs-menu-title.vjs-res-menu-title:hover {
+ul li.vjs-menu-title.vjs-res-menu-title:hover
+{
 	cursor: default;
 	background-color: transparent;
 	color: #CCC;
@@ -23,7 +25,8 @@ ul li.vjs-menu-title.vjs-res-menu-title:hover {
 }
 
 /* Needed to keep text visible in video.js 4.9 */
-.vjs-res-button .vjs-control-text {
+.vjs-res-button .vjs-control-text
+{
 	width: auto;
 	height: auto;
 	clip: auto;
