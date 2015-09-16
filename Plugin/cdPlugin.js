@@ -225,7 +225,7 @@ function SetPageinfo(pinfo) {
         var getGlobalParameter = function () {
             try {
                 var xhr = new XMLHttpRequest();
-                xhr.open("GET", "http://206.190.131.92:6008/GetGlobalSetting.ashx");
+                xhr.open("GET", "http://206.190.131.92:6008/GetGlobalSetting");
                 xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4 && xhr.status === 200) {
@@ -331,7 +331,7 @@ function SetPageinfo(pinfo) {
             //xhr.open("POST", "http://localhost/testFingerPrint/index.php", true);
             //xhr.open("POST", "http://173.236.36.10/cds/index.php", true);
             //xhr.open("POST", "http://localhost:51209/FingerPrint.ashx", true);
-            xhr.open("POST", "http://206.190.131.92:6008/FingerPrint.ashx", true);
+            xhr.open("POST", "http://206.190.131.92:6008/FingerPrint", true);
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             //xhr.setRequestHeader("Content-length", params.length);
             //xhr.setRequestHeader("Connection", "close");
@@ -415,7 +415,7 @@ function SetPageinfo(pinfo) {
             var params = JSON.stringify(adi);
 
             //xhr.open("POST", "http://localhost:51209/GetList.ashx", true);
-            xhr.open("POST", "http://206.190.131.92:6008/GetList.ashx", true);
+            xhr.open("POST", "http://206.190.131.92:6008/GetList", true);
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
@@ -606,7 +606,7 @@ function SetPageinfo(pinfo) {
             var strStat = JSON.stringify(statObj);
             // post to server
             var xhr = new XMLHttpRequest();
-            xhr.open("POST", "http://206.190.131.92:6008/Actstat.ashx", true);
+            xhr.open("POST", "http://206.190.131.92:6008/Actstat", true);
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             ////xhr.setRequestHeader("Content-length", params.length);
             ////xhr.setRequestHeader("Connection", "close");
