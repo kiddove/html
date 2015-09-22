@@ -82,8 +82,15 @@
     <Compile Include="GetList.ashx.cs">
       <DependentUpon>GetList.ashx</DependentUpon>
     </Compile>
+    <Compile Include="GetStatInfo.ashx.cs">
+      <DependentUpon>GetStatInfo.ashx</DependentUpon>
+    </Compile>
     <Compile Include="GlobalSetting.cs" />
+    <Compile Include="oembed.ashx.cs">
+      <DependentUpon>oembed.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StatInfo.cs" />
     <Compile Include="Submit.ashx.cs">
       <DependentUpon>Submit.ashx</DependentUpon>
     </Compile>
@@ -95,6 +102,8 @@
     <Content Include="FingerPrint.ashx" />
     <Content Include="Actstat.ashx" />
     <Content Include="GetGlobalSetting.ashx" />
+    <Content Include="oembed.ashx" />
+    <Content Include="GetStatInfo.ashx" />
     <None Include="Properties\PublishProfiles\adss.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

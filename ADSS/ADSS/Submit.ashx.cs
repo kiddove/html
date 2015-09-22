@@ -148,7 +148,7 @@ namespace ADSS
                 //adi.source = "http://localhost/demo/samples/kitteh.mp4";
                 //adi.type_ads = 2;
                 //adi.type_video_media = "video/mp4";
-                //adi.click_reference = "http://wwww.wyslink.com";
+                //adi.click_reference = "http://www.wyslink.com";
                 //adi.time_to_play_video_ads = 20;
                 //adi.src_account = "kiddove@gmail.com";
                 //adi.camp_start_date = "2015-04-28 00:00:00";

@@ -26,6 +26,7 @@ namespace ADSS
                 oSR.Close();
 
                 // action 1--click, 2--skip, 3--played
+                // 1 -- cpa, 2 -- cpm, 3 -- cpv??
                 ActionInfo aci = Deserialize(str);
                 if (IsValid(aci))
                 {
