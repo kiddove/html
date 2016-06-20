@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <!--<link rel="icon" href="../favicon.ico">-->
+    <title>Video Image</title>
+    <!--jquery and bootstrap-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <!--Cross-Domain AJAX for IE8 and IE9 https://github.com/MoonScript/jQuery-ajaxTransport-XDomainRequest -->
+    <!--[if lte IE 9]>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-ajaxtransport-xdomainrequest/1.0.3/jquery.xdomainrequest.min.js"></script>
+    <![endif]-->
+
+    <!--<script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>-->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <!--Parse, validate, manipulate, and display dates in JavaScript. http://momentjs.com/-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+
+    <script src="VideoImage.js"></script>
+    <link rel="stylesheet" type="text/css" href="VideoImage.css">
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="header-wrapper text-center">
+            <div class="control-wrapper pull-left" role="group">
+                <button type="button" class="btn btn-primary" id="btn-10-backward">
+                    <span class="glyphicon glyphicon-backward"></span> 10 Min
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-1-backward">
+                    <span class="glyphicon glyphicon-chevron-left"></span> 1 Min
+                </button>
+
+                <button type="button" class="btn btn-primary" id="btn-live">
+                    <span class="glyphicon glyphicon-play"></span> Live
+                </button>
+
+                <button type="button" class="btn btn-primary" id="btn-1-forward">
+                    <span class="glyphicon glyphicon-chevron-right"></span> 1 Min
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-10-forward">
+                    <span class="glyphicon glyphicon-forward"></span> 10 Min
+                </button>
+            </div>
+            <div class="date-label pull-right">
+                <h4><span class="label label-success" id="image-dt-label"></span></h4>
+            </div>
+        </div>
+        <div class="image-wrapper">
+            <img src="#" class="img-responsive" id="video-image" alt="image from camera">
+        </div>
+    </div>
+</body>
+</html>

@@ -119,6 +119,7 @@
               return;
           }
           player.ads.cancelPlayTimeout = setImmediate(function () {
+              return;
               // deregister the cancel timeout so subsequent cancels are scheduled
               player.ads.cancelPlayTimeout = null;
 
@@ -217,7 +218,7 @@
                 player.currentTime(snapshot.currentTime);
                 // now you can change the status adplaying....
                 // after src changed. and currenttime changed.
-                player.changestatus(false);
+                player.disableskip();
                 //If this wasn't a postroll resume
                 if (!player.ended()) {
                     player.play();
@@ -287,9 +288,11 @@
               // and then resume from the snapshots time once the original src has loaded
               player.one('loadedmetadata', tryToResume);
               // for rtmp by paul
-              //if (player.techName === 'Flash')
-              if (player.Ua === 'Flash')
+              if (player.techName === 'Flash' || player.Ua === 'Flash') {
+                  //if (player.Ua === 'Flash') {
+                  player.off('loadedmetadata', tryToResume);
                   tryToResume();
+              }
               //  // for rtmp by paul
               //if (player.paused())
               //    player.play();
@@ -337,6 +340,7 @@
           // when truthy, instructs the plugin to output additional information about
           // plugin state to the video.js log. On most devices, the video.js log is
           // the same as the developer console.
+          //debug: true
           debug: false
       },
 
@@ -599,6 +603,13 @@
       };
 
     // register the ad plugin framework
-    vjs.plugin('ads', adFramework);
-
+    vjs.plugin('adss', adFramework);
+    //vjs.plugin('reset', function () {
+    //    this.ads.state = 'content-set';
+    //    // kick off the fsm
+    //    if (!this.paused()) {
+    //        // simulate a play event if we're autoplaying
+    //        this.fsmHandler({ type: 'play' });
+    //    }
+    //});
 })(window, document, videojs);

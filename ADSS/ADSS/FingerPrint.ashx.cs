@@ -15,7 +15,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
+//using System.Linq;
 using System.Net;
 using System.Text;
 using System.Transactions;
@@ -30,12 +30,12 @@ namespace ADSS
     /// </summary>
     public class FingerPrint : IHttpHandler
     {
-        private string m_strIp = "";
+        //private string m_strIp = "";
         public void ProcessRequest(HttpContext context)
         {
-            m_strIp = GetVisitorIPAddress();
+            string strIP = GetVisitorIPAddress();
             //m_strIp = "99.237.172.93";
-            GeoLocation gl = GetGeoLocation();
+            GeoLocation gl = GetGeoLocation(strIP);
             //m_strIp = GetVisitorIPAddress();
             if (context.Request.InputStream.Length > 0)
             {
@@ -62,7 +62,7 @@ namespace ADSS
                 ui.fingerprint.province_code = string.IsNullOrEmpty(gl.region_code) ? "all" : gl.region_code;
                 if (ui != null && !string.IsNullOrEmpty(ui.fingerprint.token))
                 {
-                    ui.fingerprint.ip = m_strIp;
+                    ui.fingerprint.ip = strIP;
 
                     using (TransactionScope ts = new TransactionScope())
                     {
@@ -85,7 +85,7 @@ namespace ADSS
             }
             context.Response.AppendHeader("Access-Control-Allow-Origin", "*");
             context.Response.ContentType = "text/plain";
-            context.Response.Write(m_strIp);
+            context.Response.Write(strIP);
         }
 
         public bool IsReusable
@@ -215,17 +215,17 @@ namespace ADSS
             }
         }
 
-        private GeoLocation GetGeoLocation()
+        public static GeoLocation GetGeoLocation(string strIP)
         {
-            GeoLocation gl = GetGeoLocationFromDB();
+            GeoLocation gl = GetGeoLocationFromDB(strIP);
             if (string.IsNullOrEmpty(gl.ip))
-                gl = GetGeoLocationFromHttp();
+                gl = GetGeoLocationFromHttp(strIP);
             return gl;
         }
-        private GeoLocation GetGeoLocationFromHttp()
+        public static GeoLocation GetGeoLocationFromHttp(string strIP)
         {
             GeoLocation gl = new GeoLocation();
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("https://freegeoip.net/json/" + m_strIp);
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("https://freegeoip.net/json/" + strIP);
             req.Method = "GET";
             req.KeepAlive = false;
             WebResponse wres = req.GetResponse();
@@ -246,14 +246,14 @@ namespace ADSS
             return gl;
         }
 
-        private GeoLocation GetGeoLocationFromDB()
+        public static GeoLocation GetGeoLocationFromDB(string strIP)
         {
             GeoLocation gl = new GeoLocation();
             try
             {
                 using (SqlConnection sc = new SqlConnection(ConfigurationManager.ConnectionStrings["sqlserver"].ConnectionString))
                 {
-                    string strQuery = String.Format("select ip, country, province, city, province_code from dbo.tb_geolocation where ip = '{0}'", m_strIp);
+                    string strQuery = String.Format("select ip, country, province, city, province_code from dbo.tb_geolocation where ip = '{0}'", strIP);
                     using (DataSet dt = SqlHelper.ExecuteDataset(sc, CommandType.Text, strQuery))
                     {
                         if (dt != null && dt.Tables.Count > 0 && dt.Tables[0].Rows.Count == 1)
@@ -276,7 +276,7 @@ namespace ADSS
             return gl;
         }
 
-        private void InsertGeoLocation(GeoLocation gl)
+        public static void InsertGeoLocation(GeoLocation gl)
         {
             try
             {
@@ -284,6 +284,8 @@ namespace ADSS
                 {
                     if (sc != null)
                     {
+                        // xi'an for apostrophe problem
+                        gl.city = gl.city.Replace("'", "''");
                         string strSQL = String.Format("insert into tb_geolocation (ip, country, province, city, province_code) values ('{0}', '{1}', '{2}', '{3}', '{4}')", gl.ip, String.IsNullOrEmpty(gl.country_name) ? "all" : gl.country_name, String.IsNullOrEmpty(gl.region_name) ? "all" : gl.region_name, String.IsNullOrEmpty(gl.city) ? "all" : gl.city, String.IsNullOrEmpty(gl.region_code) ? "all" : gl.region_code);
                         SqlHelper.ExecuteNonQuery(sc, CommandType.Text, strSQL);
                     }

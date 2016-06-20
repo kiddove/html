@@ -15,7 +15,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
-using System.Linq;
+//using System.Linq;
 using System.Transactions;
 using System.Web;
 using System.Web.Script.Serialization;
@@ -99,7 +99,7 @@ namespace ADSS
         public override string FormSQL(List<int> ids)
         {
             // todo paul "and problem"
-            string strSQL = String.Format("select distinct(id) from dbo.tb_ads_info where camp_status = 1 {0};", m_condition.GetCondition(ids));
+            string strSQL = String.Format("select distinct(id) from dbo.tb_ads_info where camp_status = 1 {0} and camp_start_date <= GETDATE() and GETDATE() <= camp_stop_date;", m_condition.GetCondition(ids));
             return strSQL;
         }
     }
@@ -183,7 +183,7 @@ namespace ADSS
         // function
         public override string FormSQL(List<int> ids)
         {
-            string strSQL = String.Format("select id, source, type_ads, type_video_media, click_reference, time_to_play_video_ads, multstream from dbo.tb_ads_info where camp_status = 1 and id {0}", m_condition.GetCondition(ids));
+            string strSQL = String.Format("select id, source, type_ads, type_video_media, click_reference, time_to_play_video_ads, multstream from dbo.tb_ads_info where camp_status = 1 and camp_start_date <= GETDATE() and GETDATE() <= camp_stop_date and id {0}", m_condition.GetCondition(ids));
             return strSQL;
         }
 

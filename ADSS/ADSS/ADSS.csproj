@@ -90,6 +90,12 @@
       <DependentUpon>oembed.ashx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SampleAnalytics.ashx.cs">
+      <DependentUpon>SampleAnalytics.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="SampleUserInfo.ashx.cs">
+      <DependentUpon>SampleUserInfo.ashx</DependentUpon>
+    </Compile>
     <Compile Include="StatInfo.cs" />
     <Compile Include="Submit.ashx.cs">
       <DependentUpon>Submit.ashx</DependentUpon>
@@ -105,6 +111,8 @@
     <Content Include="oembed.ashx" />
     <Content Include="GetStatInfo.ashx" />
     <None Include="Properties\PublishProfiles\adss.pubxml" />
+    <Content Include="SampleUserInfo.ashx" />
+    <Content Include="SampleAnalytics.ashx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

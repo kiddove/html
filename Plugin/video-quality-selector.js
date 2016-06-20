@@ -77,7 +77,7 @@
     });
 
     // Handle clicks on the menu items
-    _V_.ResolutionMenuItem.prototype.onClick = function () {
+    _V_.ResolutionMenuItem.prototype.onClick = function (event) {
 
         // Check if this has already been called
         if (this.call_count > 0) { return; }
@@ -87,6 +87,7 @@
 
         // Increment the call counter
         this.call_count++;
+        //event.stopImmediatePropagation();
     };
 
     /***********************************************************************************
@@ -119,7 +120,14 @@
             _V_.MenuButton.call(this, player, options);
 
             // Set the button text based on the option provided
-            this.el().firstChild.firstChild.innerHTML = options.buttonText;
+            //this.el().addChild("vjs-playback-rate-value1");
+            var te = _V_.Component.prototype.createEl('div', {
+                //var te = vjs.createEl('div', {
+                className: 'vjs-res-value',
+                innerHTML: options.buttonText || 'Need Text'
+            });
+            this.el().appendChild(te);
+            this.el().firstChild.firstChild.innerHTML = 'should not be seen';
         }
     });
 
@@ -175,8 +183,9 @@
 	 ***********************************************************************************/
     _V_.plugin('resolutionSelector', function (options) {
 
+        // flash??
         // Only enable the plugin on HTML5 videos
-        if (!this.el().firstChild.canPlayType) { return; }
+        //if ( ! this.el().firstChild.canPlayType  ) { return; }	
 
         /*******************************************************************
 		 * Setup variables, parse settings
@@ -208,15 +217,18 @@
             player.currentRes = res;
         };
 
-        var str = player.currentSrc();
-        for (var ii = 0; ii < player.pageObj.multstream.length; ii++) {
-            var s = player.pageObj.multstream.charAt(ii);
+        //var str = player.currentSrc();
+        var str = options.src;
+        for (var ii = 0; ii < options.multstream.length; ii++) {
+            var s = options.multstream.charAt(ii);
 
             var src = {};
             src.src = player.currentSrc();
             src.type = player.currentType();
             //src["data-res"] = "240";
             //src.data-res = "240";
+
+            // src should contain one of _b, _d, _e
 
             switch (s) {
                 case "B":
@@ -330,7 +342,12 @@
         }
 
         // Make sure we have at least 2 available resolutions before we add the button
-        if (available_res.length < 2) { return; }
+        if (available_res.length < 2) {
+            if (player.controlBar.resolutionSelector !== undefined) {
+                player.controlBar.removeChild(player.controlBar.resolutionSelector);
+            }
+            return;
+        }
 
         // Loop through the choosen default resolutions if there were any
         for (i = 0; i < default_resolutions.length; i++) {
@@ -411,7 +428,8 @@
             // Make sure the button has been added to the control bar
             if (player.controlBar.resolutionSelector) {
 
-                button_nodes = player.controlBar.resolutionSelector.el().firstChild.children;
+                //button_nodes = player.controlBar.resolutionSelector.el().firstChild.children;
+                button_nodes = player.controlBar.resolutionSelector.el().children;
                 button_node_count = button_nodes.length;
 
                 // Update the button text
@@ -419,7 +437,8 @@
 
                     button_node_count--;
 
-                    if ('vjs-control-text' == button_nodes[button_node_count].className) {
+                    //if ('vjs-control-text' == button_nodes[button_node_count].className) {
+                    if ('vjs-res-value' == button_nodes[button_node_count].className) {
 
                         button_nodes[button_node_count].innerHTML = methods.res_label(target_resolution);
                         break;
@@ -447,6 +466,9 @@
             available_res: available_res
         });
 
+        if (player.controlBar.resolutionSelector !== undefined) {
+            player.controlBar.removeChild(player.controlBar.resolutionSelector);
+        }
         // Add the button to the control bar object and the DOM
         player.controlBar.resolutionSelector = player.controlBar.addChild(resolutionSelector);
     });

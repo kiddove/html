@@ -1,0 +1,54 @@
+.vjs-control.vjs-skip-button
+{
+	padding: 0px 10px;
+	display: none;
+	font-size: 2.0em;
+	line-height: 1.6em;
+	position: absolute;
+	/*top: 0px;*/
+	margin-bottom: 0px;
+	float: right;
+	/*left: 10px;*/
+	height: 1.6em;
+	/*width:3.0em;*/
+	text-align: center;
+	cursor: pointer;
+	font-weight: normal;
+	top: 1.5em;
+	right: 0.5em;
+	width: auto;
+	background: rgba(7,20,30,.8);
+	border: solid 2px white;
+}
+
+	.vjs-control.vjs-skip-button:hover
+	{
+		text-shadow: 0 0 .3em rgba( 255,255,255,0.8);
+	}
+
+.vjs-ad-playing.vjs-ad-enable-skip .vjs-control.vjs-skip-button
+{
+	display: block;
+}
+
+.vjs-live-streaming .vjs-progress-control
+{
+	/*some browsers may not support this*/
+	/*pointer-events: none;*/
+	display: none;
+}
+/*committed by paul, for show play button on android devide, on mobile, no autoplay*/
+/*.video-js.vjs-default-skin .vjs-big-play-button { display: none; }*/
+
+
+/*for android show big play button, others not*/
+.vjs-default-skin.vjs-not-android .vjs-big-play-button
+{
+	display: none;
+}
+
+/*hide res=-button when playing ads.*/
+.vjs-ad-playing .vjs-res-button
+{
+	display: none;
+}

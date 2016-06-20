@@ -1,8 +1,54 @@
-.vjs-control.vjs-skip-button
+.vjs-default-skin .vjs-marquee.vjs-control
 {
+	width: 100%;
+	height: 2.0em;
+	/*font size must be the same with marquee, which will inherit from here*/
+	font-size: 18px;
+	color:white;
+	font-weight: bold;
+}
+
+.vjs-default-skin .vjs-control.vjs-marquee.marquee-bottom
+{
+	top: 75%;
+}
+
+.marquee, .js-marquee
+{
+	/*vertically center*/
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+	/*font size must be the same with vjs-marquee*/
+	/*do NOT set height*/
+	line-height: 1.5;
+}
+
+.vjs-default-skin .vjs-control.vjs-banner-button {
+	/*padding: 5px;*/
+	display: none;
+	font-size:3.6em; /*Relative to the font-size of the element*/
+	float: right;
+	text-align: center;
+	cursor: pointer;
+	top: 48%;
+    right: 0.1em;
+	height:36%;
+	/*width:36%;
+	width:4.8em;*/
+	/*top + height <= 80%*/
+	border: solid 1px rgba(7,20,30,.8);
+}
+.banner-img
+{
+	width:100%;
+	height:100%;
+}
+
+.vjs-default-skin .vjs-control.vjs-skip-button {
 	padding: 0px 10px;
 	display: none;
-	font-size: 2.0em;
+	font-size: 26px;
 	line-height: 1.6em;
 	position: absolute;
 	/*top: 0px;*/
@@ -13,42 +59,40 @@
 	/*width:3.0em;*/
 	text-align: center;
 	cursor: pointer;
-	font-weight: normal;
+	font-weight:normal;
 	top: 1.5em;
-	right: 0.5em;
-	width: auto;
+    right: 0.5em;
+	width:auto;
 	background: rgba(7,20,30,.8);
 	border: solid 2px white;
 }
-
-	.vjs-control.vjs-skip-button:hover
-	{
-		text-shadow: 0 0 .3em rgba( 255,255,255,0.8);
-	}
-
-.vjs-ad-playing.vjs-ad-enable-skip .vjs-control.vjs-skip-button
-{
-	display: block;
+.vjs-control.vjs-skip-button:hover {
+    text-shadow: 0 0 .3em rgba( 255,255,255,0.8);
 }
 
-.vjs-live-streaming .vjs-progress-control
-{
+.vjs-ad-playing.vjs-ad-enable-skip .vjs-control.vjs-skip-button {
+	display:block;
+}
+
+.vjs-live-streaming .vjs-progress-control {
 	/*some browsers may not support this*/
-	/*pointer-events: none;*/
-	display: none;
+  /*pointer-events: none;*/
+	display:none;
 }
 /*committed by paul, for show play button on android devide, on mobile, no autoplay*/
 /*.video-js.vjs-default-skin .vjs-big-play-button { display: none; }*/
 
 
 /*for android show big play button, others not*/
-.vjs-default-skin.vjs-not-android .vjs-big-play-button
-{
+.vjs-default-skin.vjs-not-android .vjs-big-play-button {
+    display: none;
+}
+
+.vjs-ad-playing .vjs-res-button {
 	display: none;
 }
 
-/*hide res=-button when playing ads.*/
-.vjs-ad-playing .vjs-res-button
-{
-	display: none;
-}
+/*#example_video_1 {
+    position: relative !important;
+    width: 100% !important;
+}*/

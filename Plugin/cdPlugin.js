@@ -5,30 +5,115 @@
  * For each content video, this plugin plays one preroll and one midroll.
  * Ad content is chosen randomly from the URLs listed in inventory.json.
  */
-function ChangePlayerSource(src, type) {
-    var player = videojs("example_video_1");
-    player.change(src, type);
-}
+//function ChangePlayerSource(src, type) {
+//    var player = videojs("example_video_1");
+//    player.change(src, type);
+//}
 
-function ActionStat(act) {
-    var player = videojs("example_video_1");
-    player.stat(act);
-}
+//function ActionStat(act) {
+//    var player = videojs("example_video_1");
+//    player.stat(act);
+//}
 
-function SetPageinfo(pinfo) {
-    var player = videojs("example_video_1");
-    player.setinfo(pinfo);
-    console.log("page info: " + JSON.stringify(pinfo));
-    // quality selector
-    player.resolutionSelector();
-}
+//function SetPageinfo(pinfo) {
+//    var player = videojs("example_video_1");
+//    player.setinfo(pinfo);
+//    //console.log("page info: " + JSON.stringify(pinfo));
+//    // quality selector
+//    //player.resolutionSelector();
+//}
 
 (function (window, document, vjs, undefined) {
     "use strict";
-    
+
     var enableSkip = true;
     var bMobile = false;
     var gSetting;
+    var liveshow = false;
+    var mt;
+    
+    var teSetting = {};
+    (function initTextSetting() {
+        // v, p, c, f, t
+        teSetting.v = 0;
+        teSetting.p = "t";
+        teSetting.c = 'FFFFFF';
+        teSetting.f = 18;
+        teSetting.t = "";
+        ////if (teSetting.t === undefined) {
+        ////    console.log("undefined");
+        ////}
+        ////else {
+        //    if (teSetting.t) {
+        //    }
+        //    else {
+        //        console.log("empty string or undefined");
+        //    }
+        ////}
+    })();
+
+    function updateTextSetting(nSetting) {
+        if (nSetting === undefined)
+            return;
+
+        var needUpdate = false; // only for change text.    // other properties will affect immediately.
+        // no no no 
+        //if (!nSetting.t && tSetting.t === nSetting.t)
+        //    return;
+        // v, p, c, f, t
+        if (nSetting.v !== undefined)
+            teSetting.v = nSetting.v;
+        if (nSetting.p !== undefined) {
+            // default is top
+            // bottom has captions
+            if (nSetting.p.toUpperCase() === "B")
+                teSetting.p = "b";
+            else
+                teSetting.p = "t";
+        }
+        if (nSetting.c)
+            teSetting.c = nSetting.c;
+        else
+            teSetting.c = 'FFFFFF';
+        if (nSetting.f !== undefined) {
+            // font-size from 13 to 26
+            if (nSetting.f === 0)
+                teSetting.f = 18;
+            else if (nSetting.f < 13)
+                teSetting.f = 13;
+            else if (nSetting.f > 26)
+                teSetting.f = 26;
+            else
+                teSetting.f = nSetting.f;
+        }
+
+        if (nSetting.t) {
+            if (nSetting.t != teSetting.t) {
+                needUpdate = true;
+                teSetting.t = nSetting.t;
+            }
+        } else {
+            // 
+            if (teSetting.t) {
+                needUpdate = true;
+            }
+
+            teSetting.t = "";
+        }
+
+        // change css
+        $('.vjs-marquee.vjs-control').css("font-size", teSetting.f + "px");    // font-size
+        $('.vjs-marquee.vjs-control').css("color", "#" + teSetting.c);
+        if (teSetting.p === 'b')
+            $('.vjs-marquee.vjs-control').addClass('marquee-bottom');
+        else
+            $('.vjs-marquee.vjs-control').removeClass('marquee-bottom');
+        //// update marquee
+        if (needUpdate) {
+            $('.marquee').text(teSetting.t);
+            $('.marquee').simplemarquee('update');
+        }
+    }
 
     function canPlayAd() {
         return gSetting.campOnAir && Math.floor(Math.random() * 100) <= gSetting.percentage;
@@ -116,11 +201,14 @@ function SetPageinfo(pinfo) {
             node.onclick();
         }
         // send to server
-        ActionStat(1);
+        //ActionStat(1);
+        var player = videojs("example_video_1");
+        player.stat(1);
     }
     // reload the click event when playing ad jump to link
-    //videojs.MediaTechController.prototype.onClick = function (event) {
-    videojs.MediaTechController.prototype.u = function (event) {
+   
+    vjs.MediaTechController.prototype.onClick = function (event) {
+        //videojs.MediaTechController.prototype.u = function (event) {
         // We're using mousedown to detect clicks thanks to Flash, but mousedown
         // will also be triggered with right-clicks, so we need to prevent that
         if (event.button !== 0) return;
@@ -159,6 +247,93 @@ function SetPageinfo(pinfo) {
     //}
 
     /**
+     * add a button to show banner ads
+     */
+    videojs.Banner = videojs.Button.extend({
+        init: function (player, options) {
+            // Initialize the button using the default constructor
+            videojs.Button.call(this, player, options);
+            this.on('click', this.onClick);
+        }
+    });
+
+    /**
+    * add a button to show marquee text
+    */
+    videojs.Marquee = videojs.Button.extend({
+        init: function (player, options) {
+            // Initialize the button using the default constructor
+            videojs.Button.call(this, player, options);
+            //this.on('click', this.onClick);
+        }
+    });
+
+    function switchToLive() {
+        var player = videojs("example_video_1");
+        if (state.adPlaying) {
+            player.disableskip();
+        }
+        player.adss();
+        if (player !== undefined && player.param !== undefined && player.param.live !== undefined) {
+            player.setvod(player.param.live[0]);
+            //player.addClass('vjs-live');
+        }
+    }
+
+    videojs.Banner.prototype.onClick = function (e) {
+        //ChangePlayerSource("rtmp://206.190.133.140/liveH3Camera/demo2_wyslink_com_ch2", "rtmp/flv");
+        //ChangePlayerSource("rtmp://67.55.1.133:1935/live/cctv4", "rtmp/flv");
+        //ChangePlayerSource("http://localhost/demo/samples/i8.mp4", "video/mp4");
+        //e.preventDefault();
+        switchToLive();
+        e.stopImmediatePropagation();
+    };
+
+    //vjs.ControlBar.prototype.options_ = {
+    //    children: {
+    //        'volumeMenuButton': {
+    //            'volumeBar': {
+    //                'vertical': true
+    //            }
+    //        }
+    //    }
+    //};
+    //vjs.VolumeControl.prototype.options_ = {
+    //    children: {
+    //        'volumeBar': {
+    //            'vertical': true
+    //        }
+    //    }
+    //};
+
+    var createBanner = function () {
+        var props = {
+            className: 'vjs-banner-button vjs-control',
+            innerHTML: '<img class="banner-img" src="http://173.236.36.10/cds/samples/pets/01.jpg">' + '</img>',
+            //innerHTML: '<img class="banner-img" src="http://173.236.36.10/cds/samples/undo5.gif">' + '</img>',
+            //innerHTML: '<img class="banner-img" src="ic_blogicon.png">' + '</img>',
+            role: 'button',
+            'aria-live': 'polite',  // let the screen reader user know that the text of the button
+            tabIndex: -1
+        };
+        return videojs.Component.prototype.createEl(null, props);
+    };
+    
+    var createMarquee = function () {
+        var props = {
+            className: 'vjs-marquee vjs-control',
+            innerHTML: '<div class="marquee">' + teSetting.t + '</div>',
+            //innerHTML: '<div class="marquee">' + 'what does the fox say, ding ling ling ling ling......' + '</div>',
+            //innerHTML: '<img class="banner-img" src="http://173.236.36.10/cds/samples/undo5.gif">' + '</img>',
+            //innerHTML: '<img class="banner-img" src="ic_blogicon.png">' + '</img>',
+            role: 'button',
+            'aria-live': 'polite',  // let the screen reader user know that the text of the button
+            tabIndex: -1
+        };
+        return videojs.Component.prototype.createEl(null, props);
+    };
+
+    /**
      * Add a skip button for the Ads Plugin
      * enable/disable count down then skip
      */
@@ -179,7 +354,7 @@ function SetPageinfo(pinfo) {
             innerHTML: '<div class="vjs-control-content">' + ('Skip Ad.') + '</div>',
             role: 'button',
             'aria-live': 'polite',  // let the screen reader user know that the text of the button
-            tabIndex: 0
+            tabIndex: -1
         };
         return videojs.Component.prototype.createEl(null, props);
     };
@@ -202,6 +377,7 @@ function SetPageinfo(pinfo) {
 
         //ActionStat(2);
         player.stat(2);
+        e.stopImmediatePropagation();
     };
 
     var state = {};
@@ -209,7 +385,9 @@ function SetPageinfo(pinfo) {
     var userToken;
     var curAd = {};
     var midrollList = [];
-
+    var curVod = 0;
+    //var timeline = new Map();
+    var timeline = new Object();
     /**
      * Register the ad integration plugin.
      * To initialize for a player, call player.regAds().
@@ -219,6 +397,67 @@ function SetPageinfo(pinfo) {
     vjs.plugin('regAds', function (options) {
         // check cookie
         // if not exist..
+        function myTimer() {
+            try {
+                var xhr = new XMLHttpRequest();
+                //xhr.open("GET", "http://192.168.9.13/flag.txt");
+                //xhr.open("GET", "http://192.168.9.13/livesignal?u=" + player.param.common.account);
+                xhr.open("GET", "http://173.236.36.10/livesignal?u=" + player.param.common.account);
+                //xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                //xhr.setRequestHeader("Cache-Control", "no-cache");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        try {
+                            //var resp = xhr.responseText;
+                            //console.log('timer result:' + resp);
+
+                            try {
+                                var resp = JSON.parse(xhr.responseText);
+                                updateTextSetting(resp);
+                            }
+                            catch (err) {
+                                return;
+                            }
+                            if (teSetting.v !== 0) {
+                                // set to live if not live
+                                if (liveshow === false) {
+                                    liveshow = true;
+                                    //if (player !== undefined && player.param !== undefined && player.param.live !== undefined) {
+                                    //    curVod = parseInt(resp) - 1;
+                                    //    if (curVod >= 0 && curVod < player.param.live.length) {
+                                    //        player.setvod(player.param.live[curVod]);
+                                    //    }
+                                    //}
+                                    switchToLive();
+                                }
+                            }
+                            else {
+                                // set to vod if is live
+                                if (liveshow === true) {
+                                    liveshow = false;
+                                    if (player !== undefined && player.param !== undefined && player.param.vod !== undefined && player.param.vod.length > 0) {
+                                        curVod = 0;
+                                        player.setvod(player.param.vod[curVod]);
+                                        player.regAds();
+                                    }
+                                }
+                            }
+
+
+                        } catch (err) {
+                            throw new Error(err);
+                        }
+                    }
+                };
+                xhr.send();
+            }
+            catch (err) {
+                throw new Error(err);
+            }
+        }
+        if (mt === undefined)
+            mt = setInterval(myTimer, 10000);
+
         userToken = getCookie("kec_token");
 
         // get global parameters
@@ -232,35 +471,39 @@ function SetPageinfo(pinfo) {
                         try {
                             gSetting = JSON.parse(xhr.responseText);
 
-                            try {
-                                if (player.pageObj.Monietized.toUpperCase() === "disabled".toUpperCase())
-                                    gSetting.campOnAir = false;
-                            } catch (err) {
-                            }
+                            genMidrollList();
+                            //try {
+                            //    if (player.pageObj.Monietized.toUpperCase() === "disabled".toUpperCase())
+                            //        gSetting.campOnAir = false;
+                            //} catch (err) {
+                            //}
                             //gSetting.campOnAir = false;
-
+                            if (player.param.common.monietized.toUpperCase() === "disabled".toUpperCase())
+                                return;
                             // requestAds must call after gSetting has value
                             try {
                                 // request ad inventory whenever the player gets new content to play
                                 //player.on('contentupdate', requestAds);
-                                player.one('contentupdate', requestAds);
+                                //player.one('contentupdate', requestAds);
                                 // if there's already content loaded, request an add immediately
                                 if (player.currentSrc()) {
                                     requestAds();
+                                } else {
+                                    player.one('contentupdate', requestAds);
                                 }
                             } catch (err) {
-                                throw new Error('Couldn\'t parse inventory response as JSON');
+                                throw new Error(err);
                             }
 
                         } catch (err) {
-                            throw new Error('Couldn\'t parse global setting response as JSON');
+                            throw new Error(err);
                         }
                     }
                 };
                 xhr.send();
             }
             catch (err) {
-                throw new Error('get global setting error.');
+                throw new Error(err);
             }
         };
 
@@ -298,9 +541,16 @@ function SetPageinfo(pinfo) {
                 bMobile = false;
             } else
                 bMobile = true;
+
+            
             uploadObj.os = ua.os.name;
 
             var player = videojs("example_video_1");
+
+            if (bMobile) {
+                player.controlBar.removeChild(player.controlBar.muteToggle);
+                player.controlBar.removeChild(player.controlBar.volumeControl);
+            }
 
             var isiPad = navigator.userAgent.match(/iPad/i) != null;
 
@@ -337,7 +587,8 @@ function SetPageinfo(pinfo) {
             //xhr.setRequestHeader("Connection", "close");
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    getGlobalParameter();
+                    if (gSetting === undefined)
+                        getGlobalParameter();
                     //try {
                     //    // request ad inventory whenever the player gets new content to play
                     //    player.on('contentupdate', requestAds);
@@ -359,8 +610,55 @@ function SetPageinfo(pinfo) {
         var btn_options = {
             'el': createSkipButton()
         };
-        var btnSkip = new videojs.SkipButton(this, btn_options);
-        var skipbutton = this.addChild(btnSkip);
+        if (this.skipbutton === undefined) {
+            var btnSkip = new videojs.SkipButton(this, btn_options);
+            this.skipbutton = this.addChild(btnSkip);
+        }
+
+        // add banner button
+        var btn_banner_options = {
+            'el': createBanner()
+        };
+
+        // by paul not using now.
+        //if (this.bannerbutton === undefined) {
+        //    var btnBanner = new videojs.Banner(this, btn_banner_options);
+        //    this.bannerbutton = this.addChild(btnBanner);
+        //}
+
+        // add marquee
+        var btn_marquee_options = {
+            'el': createMarquee()
+        };
+
+        if (this.marquee === undefined) {
+            var btnMarquee = new videojs.Marquee(this, btn_marquee_options);
+            this.marquee = this.addChild(btnMarquee);
+
+            //$('.marquee').marquee({
+            //    //speed in milliseconds of the marquee
+            //    duration: 10000,
+            //    //gap in pixels between the tickers
+            //    gap: 70,
+            //    //time in milliseconds before the marquee will start animating
+            //    delayBeforeStart: 0,
+            //    //'left' or 'right'
+            //    direction: 'left',
+            //    //true or false - should the marquee be duplicated to show an effect of continues flow
+            //    duplicated: false//,
+            //    //pauseOnHover: true,
+            //    //allowCss3Support: false
+            //});
+            $('.marquee').simplemarquee({
+                speed: 60,
+               // direction: left,
+                cycles: Infinity,
+                space: 40,
+                handleHover: true,
+                handleResize:true
+            });
+        }
+
         var
 
         player = this,
@@ -375,7 +673,7 @@ function SetPageinfo(pinfo) {
         // asynchronous method for requesting ad inventory
         requestAds = function () {
 
-            if (!gSetting.campOnAir)
+            if (gSetting === undefined || gSetting.campOnAir === undefined || !gSetting.campOnAir)
                 return false;
             // reset plugin state
             //state = {};
@@ -396,22 +694,21 @@ function SetPageinfo(pinfo) {
             adi.token.push(userToken);
             //var adi = {};
             //adi.type_ads = 1;
-            
+
             //// network... 
             try {
-                if (player.pageObj.Monietized.toUpperCase() !== "AllowedAll".toUpperCase()) {
-                    for (var idx = 0; idx < player.pageObj.whitelist.length; idx++) {
-                        adi.tgt_network.network.push(player.pageObj.whitelist[idx]);
+                if (player.param.common.monietized.toUpperCase() !== "AllowedAll".toUpperCase()) {
+                    for (var idx = 0; idx < player.param.common.whitelist.length; idx++) {
+                        adi.tgt_network.network.push(player.param.common.whitelist[idx]);
                     }
                 } else {
                     adi.tgt_network.network.push("all");
-                    adi.tgt_network.network.push(player.pageObj.account);
+                    adi.tgt_network.network.push(player.param.common.account);
                 }
             } catch (err) {
-                // if setpageinfo failed or not called
-                adi.tgt_network.network.push("none");
+
             }
-            
+
             var params = JSON.stringify(adi);
 
             //xhr.open("POST", "http://localhost:51209/GetList.ashx", true);
@@ -443,7 +740,7 @@ function SetPageinfo(pinfo) {
                         //    params: {error: false}
                         //});
                     } catch (err) {
-                        throw new Error('Couldn\'t parse inventory response as JSON');
+                        throw new Error(err);
                     }
                 }
             };
@@ -453,14 +750,15 @@ function SetPageinfo(pinfo) {
 
         genMidrollList = function () {
             //player.trigger('adsready');
-
             midrollList = [];
+            //timeline.clear();
+            timeline = {};
             var duration = player.duration();
             // for android m3u8 duration returen 0... cannot show live..
             if (duration === Infinity || duration <= 0) {
-                this.addClass('vjs-live');
+                player.addClass('vjs-live');
             } else {
-                this.removeClass('vjs-live');
+                player.removeClass('vjs-live');
             }
 
             if (state.adPlaying || gSetting === undefined || gSetting.timeInterval <= 0)
@@ -468,13 +766,23 @@ function SetPageinfo(pinfo) {
             //if (state.preroll || state.midroll) {
             if (duration < 0 || duration === Infinity)
                 return;
+
             var t = gSetting.timeInterval + gSetting.timeInterval / 2;
-                while (t <= duration) {
+            while (t <= duration) {
                 if ((t - gSetting.timeInterval / 2) > 0 && (t - gSetting.timeInterval / 2) % gSetting.timeInterval == 0) {
-                        midrollList.push(t);
-                    }
-                t += gSetting.timeInterval;
+                    midrollList.push(t);
                 }
+                t += gSetting.timeInterval;
+            }
+            //timeline.clear();
+            timeline = {};
+            t = 3 * 60;
+            while (t <= duration) {
+                //timeline.set(Math.floor(t / 10), false);
+                timeline[Math.floor(t / 10)] = false;
+                t += 3 * 60;
+            }
+
             //}
         },
 
@@ -509,25 +817,33 @@ function SetPageinfo(pinfo) {
                 curAd = state.inventory.pre[Math.floor(Math.random() * state.inventory.pre.length)];
                 ca.src = curAd.src;
                 ca.type = curAd.type;
-                if (curAd.multstream !== undefined) {
-                    if (bMobile) {
-                        if (curAd.multstream.indexOf("B") > 0 || curAd.multstream.indexOf("b") > 0) {
-                            var pos = ca.src.lastIndexOf(".mp4");
-                            ca.src = ca.src.substring(0, pos);
-                            ca.src += "_B.mp4";
-                        }
-                    } else {
-                        if (curAd.multstream.indexOf("D") > 0 || curAd.multstream.indexOf("d") > 0) {
-                            var pos = ca.src.lastIndexOf(".mp4");
-                            ca.src = ca.src.substring(0, pos);
-                            ca.src += "_D.mp4";
-                        } else if (curAd.multstream.indexOf("B") > 0 || curAd.multstream.indexOf("b") > 0) {
-                            var pos = ca.src.lastIndexOf(".mp4");
-                            ca.src = ca.src.substring(0, pos);
-                            ca.src += "_B.mp4";
-                        }
+                // ad has odbe property..
+                if (bMobile) {
+                    if (curAd.multstream.indexOf("B") > 0 || curAd.multstream.indexOf("b") > 0) {
+                        var pos = ca.src.lastIndexOf(".mp4");
+                        ca.src = ca.src.substring(0, pos);
+                        ca.src += "_B.mp4";
+                    }
+                } else {
+                    if (curAd.multstream.indexOf("D") > 0 || curAd.multstream.indexOf("d") > 0) {
+                        var pos = ca.src.lastIndexOf(".mp4");
+                        ca.src = ca.src.substring(0, pos);
+                        ca.src += "_D.mp4";
+                    } else if (curAd.multstream.indexOf("B") > 0 || curAd.multstream.indexOf("b") > 0) {
+                        var pos = ca.src.lastIndexOf(".mp4");
+                        ca.src = ca.src.substring(0, pos);
+                        ca.src += "_B.mp4";
                     }
                 }
+                //if (bMobile) {
+                //    var pos = ca.src.lastIndexOf(".mp4");
+                //    ca.src = ca.src.substring(0, pos);
+                //    ca.src += "_B.mp4";
+                //} else {
+                //    var pos = ca.src.lastIndexOf(".mp4");
+                //    ca.src = ca.src.substring(0, pos);
+                //    ca.src += "_D.mp4";
+                //}
             }
 
             // tell ads plugin we're ready to play our ad
@@ -551,8 +867,8 @@ function SetPageinfo(pinfo) {
             });
 
             // when it's finished
-            player.one('ended', function () {
-            //player.one('adended', function () {
+            //player.one('ended', function () {
+            player.one('adended', function () {
                 // play your linear ad content, then when it's finished ...
                 player.ads.endLinearAdMode();
                 //player.el().className = player.el().className.replace(/(?:^|\s)vjs-ad-enable-skip(?!\S)/g, "");
@@ -563,37 +879,69 @@ function SetPageinfo(pinfo) {
             player.stat(3);
         };
 
-        // by paul decode the url
-        if (options instanceof Object) {
-            if (options.src) {
-                options.src = DecryptByDES(options.src, "phpWVnet");
-                player.src(options);
-            }
-        }
-
         // initialize the ads plugin, passing in any relevant options
-        player.ads(options);
+        player.adss();
+
         // forbidden right click
         player.on('contextmenu', function (e) {
             e.preventDefault();
         });
-        var changesrc = function (s, t) {
-            if (s && t) {
-                console.log("change src.");
-                var player = videojs("example_video_1");
-                player.src({ src: DecryptByDES(s, "phpWVnet"), type: t });
-                //player.src({ src: s, type: t });
-                changestatus(false);
-                player.play();
-            }
-        };
 
-        var changestatus = function (s) {
-            state.adPlaying = s;
-            if (s === false) {
+        // when it's finished
+        player.one('ended', function () {
+            if (state.adPlaying) {
+                //player.one('adended', function () {
+                // play your linear ad content, then when it's finished ...
+                player.ads.endLinearAdMode();
                 //player.el().className = player.el().className.replace(/(?:^|\s)vjs-ad-enable-skip(?!\S)/g, "");
-                player.removeClass("vjs-ad-enable-skip");
+                //console.log("*** ads end, disable skip: " + player.el().className);
+                state.adPlaying = false;
+                //console.log("adPlaying set to false in event 'ended'.");
+                player.one('ended', function () {
+                    if (state.adPlaying) {
+                        //player.one('adended', function () {
+                        // play your linear ad content, then when it's finished ...
+                        player.ads.endLinearAdMode();
+                        //player.el().className = player.el().className.replace(/(?:^|\s)vjs-ad-enable-skip(?!\S)/g, "");
+                        //console.log("*** ads end, disable skip: " + player.el().className);
+                        state.adPlaying = false;
+                        //console.log("adPlaying set to false in event 'ended'.");
+                    } else {
+                        // go to next vod
+                        curVod++;
+                        if (curVod >= player.param.vod.length)
+                            curVod = 0;
+                        player.setvod(player.param.vod[curVod]);
+                        player.regAds();
+                    }
+                });
+
+            } else {
+                // go to next vod
+                curVod++;
+                if (curVod >= player.param.vod.length)
+                    curVod = 0;
+                player.setvod(player.param.vod[curVod]);
+                player.regAds();
             }
+        });
+
+        //var changesrc = function (s, t) {
+        //    if (s && t) {
+        //        //console.log("change src.");
+        //        var player = videojs("example_video_1");
+        //        //player.src({ src: DecryptByDES(s, "phpWVnet"), type: t });
+        //        player.src({ src: s, type: t });
+        //        changestatus(false);
+        //        player.play();
+        //    }
+        //};
+
+        var disableskipbutton = function () {
+            if (state.adPlaying === true)
+                state.adPlaying = false;
+            if (player.hasClass("vjs-ad-enable-skip"))
+                player.removeClass("vjs-ad-enable-skip");
         };
 
         var actstat = function (act) {
@@ -628,28 +976,49 @@ function SetPageinfo(pinfo) {
             xhr.send(strStat);
         };
 
-        var setpageinfo = function (pageinfo) {
-            try {
-            	var pageObj;
-            	if (typeof pageinfo == "string")
-                player.pageObj = JSON.parse(pageinfo);
-                else if (typeof pageinfo == "object")
-                player.pageObj = pageinfo;
-                //try {
-                //    if (player.pageObj.Monietized.toUpperCase() === "disabled".toUpperCase())
-                //        gSetting.campOnAir = false;
-                //} catch (err) {
-                //    console.log(err.message);
-                //}
-            } catch (err) {
-                throw new Error('Couldn\'t parse pageinfo response as JSON');
-            }
-        };
         // vjs.plugin('ads', adFramework);
-        vjs.plugin('change', changesrc);
-        vjs.plugin('changestatus', changestatus);
+        //vjs.plugin('change', changesrc);
+        vjs.plugin('disableskip', disableskipbutton);
         vjs.plugin('stat', actstat);
-	vjs.plugin('setinfo', setpageinfo);
+
+        vjs.plugin('setvod', function (vod) {
+            var vd = {};
+            //vd.src = vod.src;
+            vd.src = DecryptByDES(vod.src, "phpWVnet");
+            vd.type = vod.type;
+            player.src(vd);
+            player.setinfo(vod);
+            if (player.param.common.monietized.toUpperCase() === "disabled".toUpperCase())
+                return;
+            // requestAds must call after gSetting has value
+            try {
+                // request ad inventory whenever the player gets new content to play
+                //player.on('contentupdate', requestAds);
+                
+                // if there's already content loaded, request an add immediately
+                if (player.currentSrc()) {
+                    requestAds();
+                } else {
+                    player.one('contentupdate', requestAds);
+                }
+            } catch (err) {
+                throw new Error(err);
+            }
+
+        });
+        // by paul decode the url
+        if (options instanceof Object) {
+            if (options.src) {
+                options.src = DecryptByDES(options.src, "phpWVnet");
+                player.src(options);
+
+            }
+        } else if (typeof options == "string") {
+            player.param = JSON.parse(options);
+            if (player.param.vod.length > 0) {
+                player.setvod(player.param.vod[curVod]);
+            }
+        }
 
         //// request ad inventory whenever the player gets new content to play
         //player.on('contentupdate', requestAds);
@@ -661,15 +1030,15 @@ function SetPageinfo(pinfo) {
 
         // if not ad, then generate the list .
         player.on('loadedmetadata', genMidrollList);
-
         // play an ad the first time there's a preroll opportunity
-        player.on('readyforpreroll', function () {
+        player.on('readyforpreroll', function (event) {
             //// check if this invetory contains preroll ads
             //if (state.inventory.pre)
             //if (!state.prerollPlayed) {
             //    state.prerollPlayed = true;
             //    playAd();
             //}
+            event.stopImmediatePropagation();
             state.preroll = true;
             state.midroll = false;
             playAd();
@@ -689,7 +1058,7 @@ function SetPageinfo(pinfo) {
             else
                 state.lastTime = 0;
             if (state.adPlaying) {
-                if (opportunity_show_skip) {
+                if (opportunity_show_skip && !player.hasClass("vjs-ad-enable-skip")) {
                     player.addClass("vjs-ad-enable-skip");
                     //var sName = player.el().className.toString();
                     //if (sName.indexOf("vjs-ad-enable-skip") == -1) {
@@ -704,48 +1073,91 @@ function SetPageinfo(pinfo) {
             }
             //else
             //    console.log("not ads curtime: " + currentTime + " & state.lasttime: " + state.lastTime + " ***");
-            if (!state.adPlaying && Math.floor(currentTime) > state.lastTime) {
+            if (!state.adPlaying) { //&& Math.floor(currentTime) > state.lastTime) {
 
-                // after end or skip adPlaying will be false, but src may not be changed due to event async.
-                if (player.currentSrc() === curAd.src)
-                    return;
-                if (curs === undefined || curs != player.currentSrc()) {
-                    //console.log("not ads curSrc: pre --- " + curs + "    after --- " + player.currentSrc() + " currentTime: " + currentTime + " state.lastTime: " + state.lastTime);
-                    curs = player.currentSrc();
-                }
-
-                state.lastTime = Math.floor(currentTime);
-                if (state.lastTime === 0)
-                    console.log("state.lastTime: " + state.lastTime + " ***");
-                //console.log("state.lastTime: " + state.lastTime + " ***");
-
-                //////////////////////////////////////////
-                // modified by paul now all use pre,
-                //var i = 0;
-                //if (!state.inventory || !state.inventory.mid)
-                //    return;
-                //for (i = 0; i < state.inventory.mid.length; i++) {
-                //    if (state.inventory.mid[i].ads_time == state.lastTime) {
-                //        curAd = state.inventory.mid[i];
-                //        state.midroll = true;
-                //        state.preroll = false;
-                //        //console.log("midroll at :" + state.lastTime + ", curtime: " + currentTime);
-                //        playAd();
-                //    }
-                //}
-                /////////////////////////////////////////////////////
-
-                // use cuepoint what about drag...
-                var i = 0;
-                for (i = 0; i < midrollList.length; i++) {
-                    if (midrollList[i] == state.lastTime) {
-                        state.midroll = true;
-                        state.preroll = false;
-                        //console.log("midroll at :" + state.lastTime + ", curtime: " + currentTime);
-                        playAd();
+                if (player.hasClass('vjs-live')) {
+                    var t = Math.floor(Math.floor(currentTime) / 10);
+                    if (t > 0) {
+                        //if (!timeline.has(t)) {
+                        //    timeline.set(t, true);
+                        //    //console.log('should send to server at ' + t + '.');
+                        //}
+                        //if (timeline.size > 10) {
+                        //    // remove previous one
+                        //    timeline.clear();
+                        //    timeline.set(t, true);
+                        //}
+                        if (timeline[t] !== undefined && timeline[t] === false) {
+                            //timeline.set(t, true);
+                            timeline[t] = true;
+                            console.log('should send to server at ' + t * 10 + '.');
+                        }
+                        if (timeline.length > 10) {
+                            // remove previous one
+                            timeline = {};
+                            timeline[t] = true;
+                        }
                     }
                 }
+                else {
+                    var t = Math.floor(Math.floor(currentTime) / 10);
+                    try {
+                        //if (timeline.has(t) && !timeline[t]) {
+                        //    timeline[t] = true;
+                        //    //console.log('should send to server at ' + t + '.');
+                        //}
+                        if (timeline[t] !== undefined && timeline[t] === false) {
+                            //timeline[t] = true;
+                            timeline[t] = true;
+                            console.log('should send to server at ' + t * 10 + '.');
+                        }
+                    }
+                    catch (err) {
+                    }
+                }
+                if (Math.floor(currentTime) > state.lastTime) {
 
+
+                    // after end or skip adPlaying will be false, but src may not be changed due to event async.
+                    if (player.currentSrc() === curAd.src)
+                        return;
+                    if (curs === undefined || curs != player.currentSrc()) {
+                        //console.log("not ads curSrc: pre --- " + curs + "    after --- " + player.currentSrc() + " currentTime: " + currentTime + " state.lastTime: " + state.lastTime);
+                        curs = player.currentSrc();
+                    }
+
+                    state.lastTime = Math.floor(currentTime);
+                    if (state.lastTime === 0)
+                        console.log("state.lastTime: " + state.lastTime + " ***");
+                    //console.log("state.lastTime: " + state.lastTime + " ***");
+
+                    //////////////////////////////////////////
+                    // modified by paul now all use pre,
+                    //var i = 0;
+                    //if (!state.inventory || !state.inventory.mid)
+                    //    return;
+                    //for (i = 0; i < state.inventory.mid.length; i++) {
+                    //    if (state.inventory.mid[i].ads_time == state.lastTime) {
+                    //        curAd = state.inventory.mid[i];
+                    //        state.midroll = true;
+                    //        state.preroll = false;
+                    //        //console.log("midroll at :" + state.lastTime + ", curtime: " + currentTime);
+                    //        playAd();
+                    //    }
+                    //}
+                    /////////////////////////////////////////////////////
+
+                    // use cuepoint what about drag...
+                    var i = 0;
+                    for (i = 0; i < midrollList.length; i++) {
+                        if (midrollList[i] == state.lastTime) {
+                            state.midroll = true;
+                            state.preroll = false;
+                            //console.log("midroll at :" + state.lastTime + ", curtime: " + currentTime);
+                            playAd();
+                        }
+                    }
+                }
             }
             //else
             //    //
@@ -759,7 +1171,43 @@ function SetPageinfo(pinfo) {
             //    playAd();
             //}
         });
+
+        //videojs("example_video_1").ready(function () {
+        //    this.cuepoints();
+        //    this.addCuepoint({
+        //        namespace: "logger",
+        //        start: 0,
+        //        end: -1,
+        //        onStart: function (params) {
+        //            if (params.error) {
+        //                console.error("Error at second 0");
+        //            } else {
+        //                console.log("Log at second 0");
+        //            }
+        //        },
+        //        onEnd: function (params) {
+        //            console.log("Action ends at second 30");
+        //        },
+        //        params: { error: false }
+        //    });
+        //});
     });
-
-
+    vjs.plugin('setinfo', function (videoinfo) {
+        try {
+            var player = videojs("example_video_1");
+            if (typeof videoinfo == "string")
+                player.videoObj = JSON.parse(videoinfo);
+            else if (typeof videoinfo == "object")
+                player.videoObj = videoinfo;
+            //try {
+            //    if (player.pageObj.Monietized.toUpperCase() === "disabled".toUpperCase())
+            //        gSetting.campOnAir = false;
+            //} catch (err) {
+            //    console.log(err.message);
+            //}
+            videojs("example_video_1").resolutionSelector(player.videoObj);
+        } catch (err) {
+            throw new Error(err);
+        }
+    });
 })(window, document, videojs);

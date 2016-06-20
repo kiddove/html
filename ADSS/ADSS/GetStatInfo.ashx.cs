@@ -1,10 +1,46 @@
-﻿using System;
+﻿/*****************************************************************************
+Copyright: 
+File name: GetStatInfo.ashx.cs
+Description: receive a GET request, return the statics of specific ad.
+Author: paul
+Version: 1.0
+Date: 09/22/2015
+History: 
+
+*****************************************************************************/
+//
+//                                  _oo8oo_
+//                                 o8888888o
+//                                 88" . "88
+//                                 (| -_- |)
+//                                 0\  =  /0
+//                               ___/'==='\___
+//                             .' \\|     |// '.
+//                            / \\|||  :  |||// \
+//                           / _||||| -:- |||||_ \
+//                          |   | \\\  -  /// |   |
+//                          | \_|  ''\---/''  |_/ |
+//                          \  .-\__  '-'  __/-.  /
+//                        ___'. .'  /--.--\  '. .'___
+//                     ."" '<  '.___\_<|>_/___.'  >' "".
+//                    | | :  `- \`.:`\ _ /`:.`/ -`  : | |
+//                    \  \ `-.   \_ __\ /__ _/   .-` /  /
+//                =====`-.____`.___ \_____/ ___.`____.-`=====
+//                                  `=---=`
+// 
+// 
+//               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//                          佛祖保佑         永不宕机/永无bug
+//
+
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
+//using System.Linq;
 using System.Web;
 using System.Web.Script.Serialization;
 using System.Xml.Serialization;
@@ -29,8 +65,18 @@ namespace ADSS
 
             string strResult = getResult(rp, bidList);
 
-
-            context.Response.ContentType = "text/plain";
+            if (String.IsNullOrEmpty(strResult))
+            {
+                context.Response.ContentType = "text/plain";
+            }
+            else
+            {
+                if (String.Equals(rp.format, "xml", StringComparison.OrdinalIgnoreCase))
+                    context.Response.ContentType = "application/xml";
+                else
+                    context.Response.ContentType = "application/json";
+            }
+            context.Response.AppendHeader("Access-Control-Allow-Origin", "*");
             context.Response.Write(strResult);
         }
 
@@ -90,7 +136,8 @@ namespace ADSS
             // type -- 3, by dow
             // type -- 4, by week
             // type -- 5, by device
-            // type -- 6, by platform
+            // type -- 6, by platform -- to be continued...
+            // type -- 7, by os -- to be continued...
             if (context.Request.QueryString["type"] != null)
                 rp.type = Convert.ToInt32(context.Request.QueryString["type"]);
             // language, en/zh/jp by default en
@@ -388,8 +435,8 @@ namespace ADSS
                                     LocationReportItem lri = new LocationReportItem();
                                     lri.country = Convert.ToString(r[1]);
                                     lri.province = Convert.ToString(r[2]);
-                                    lri.city = Convert.ToString(r[3]);
-                                    lri.province_code = Convert.ToString(r[4]);
+                                    lri.city = Convert.ToString(r[4]);
+                                    lri.province_code = Convert.ToString(r[3]);
 
                                     sbl.ReportByLocation.Add(lri);
                                     iIndex++;
@@ -426,7 +473,7 @@ namespace ADSS
                                 if (String.Equals(sbl.ReportByLocation[iIndex].city, "all", StringComparison.OrdinalIgnoreCase))
                                     sbl.ReportByLocation[iIndex].city = "";
 
-                                if (rp.moneyIssue && bl.Count > 0)
+                                if (rp.moneyIssue && bl != null && bl.Count > 0)
                                 {
                                     // step 3
                                     // calculate cost
@@ -471,13 +518,17 @@ namespace ADSS
                                     lr.cpv += sbl.ReportByLocation[i].cpv;
                                 }
 
+                                // 2 precision
+                                lr.cpa = Convert.ToSingle(Math.Round(lr.cpa, 2));
+                                lr.cpm = Convert.ToSingle(Math.Round(lr.cpm, 2));
+                                lr.cpv = Convert.ToSingle(Math.Round(lr.cpv, 2));
                                 sbl.ReportByLocation.Add(lr);
                             }
 
                             if (String.Equals(rp.format, "xml", StringComparison.OrdinalIgnoreCase))
                             {
                                 XmlSerializer x = new XmlSerializer(sbl.GetType());
-                                using (StringWriter txtWriter = new StringWriter())
+                                using (StringWriter txtWriter = new Utf8StringWriter())
                                 {
                                     x.Serialize(txtWriter, sbl);
                                     strResult = txtWriter.ToString();
@@ -522,6 +573,7 @@ namespace ADSS
                 return String.Format(" and tb_user_stat.time > '{0}' and tb_user_stat.time < '{1}'", rp.startDate, rp.endDate);
             }
         }
+
         public string getDateStat(RequestParameters rp, List<BidInfo> bl)
         {
             // stat by single date
@@ -582,7 +634,7 @@ namespace ADSS
                                         break;
                                 }
 
-                                if (rp.moneyIssue && bl.Count > 0)
+                                if (rp.moneyIssue && bl != null && bl.Count > 0)
                                 {
                                     // step 3
                                     // calculate cost
@@ -627,14 +679,17 @@ namespace ADSS
                                     tr.cpm += sbd.ReportByTime[i].cpm;
                                     tr.cpv += sbd.ReportByTime[i].cpv;
                                 }
-
+                                // 2 precision
+                                tr.cpa = Convert.ToSingle(Math.Round(tr.cpa, 2));
+                                tr.cpm = Convert.ToSingle(Math.Round(tr.cpm, 2));
+                                tr.cpv = Convert.ToSingle(Math.Round(tr.cpv, 2));
                                 sbd.ReportByTime.Add(tr);
                             }
 
                             if (String.Equals(rp.format, "xml", StringComparison.OrdinalIgnoreCase))
                             {
                                 XmlSerializer x = new XmlSerializer(sbd.GetType());
-                                using (StringWriter txtWriter = new StringWriter())
+                                using (StringWriter txtWriter = new Utf8StringWriter())
                                 {
                                     x.Serialize(txtWriter, sbd);
                                     strResult = txtWriter.ToString();
@@ -721,7 +776,7 @@ namespace ADSS
                                         break;
                                 }
 
-                                if (rp.moneyIssue && bl.Count > 0)
+                                if (rp.moneyIssue && bl != null && bl.Count > 0)
                                 {
                                     // step 3
                                     // calculate cost
@@ -766,14 +821,17 @@ namespace ADSS
                                     tr.cpm += sbd.ReportByTime[i].cpm;
                                     tr.cpv += sbd.ReportByTime[i].cpv;
                                 }
-
+                                // 2 precision
+                                tr.cpa = Convert.ToSingle(Math.Round(tr.cpa, 2));
+                                tr.cpm = Convert.ToSingle(Math.Round(tr.cpm, 2));
+                                tr.cpv = Convert.ToSingle(Math.Round(tr.cpv, 2));
                                 sbd.ReportByTime.Add(tr);
                             }
 
                             if (String.Equals(rp.format, "xml", StringComparison.OrdinalIgnoreCase))
                             {
                                 XmlSerializer x = new XmlSerializer(sbd.GetType());
-                                using (StringWriter txtWriter = new StringWriter())
+                                using (StringWriter txtWriter = new Utf8StringWriter())
                                 {
                                     x.Serialize(txtWriter, sbd);
                                     strResult = txtWriter.ToString();
@@ -821,7 +879,7 @@ namespace ADSS
                         if (ds != null && ds.Tables.Count > 0)
                         {
                             StatByWeek sbw = new StatByWeek();
-                            int ideDate = 0; 
+                            int ideDate = 0;
                             int iIndex = -1;
                             // 201533,	20150809,	09 Aug 2015,	20150815,	15 Aug 2015,	2,	16
                             for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
@@ -862,7 +920,7 @@ namespace ADSS
                                         break;
                                 }
 
-                                if (rp.moneyIssue && bl.Count > 0)
+                                if (rp.moneyIssue && bl != null && bl.Count > 0)
                                 {
                                     // step 3
                                     // calculate cost
@@ -906,14 +964,17 @@ namespace ADSS
                                     wr.cpm += sbw.ReportByWeek[i].cpm;
                                     wr.cpv += sbw.ReportByWeek[i].cpv;
                                 }
-
+                                // 2 precision
+                                wr.cpa = Convert.ToSingle(Math.Round(wr.cpa, 2));
+                                wr.cpm = Convert.ToSingle(Math.Round(wr.cpm, 2));
+                                wr.cpv = Convert.ToSingle(Math.Round(wr.cpv, 2));
                                 sbw.ReportByWeek.Add(wr);
                             }
 
                             if (String.Equals(rp.format, "xml", StringComparison.OrdinalIgnoreCase))
                             {
                                 XmlSerializer x = new XmlSerializer(sbw.GetType());
-                                using (StringWriter txtWriter = new StringWriter())
+                                using (StringWriter txtWriter = new Utf8StringWriter())
                                 {
                                     x.Serialize(txtWriter, sbw);
                                     strResult = txtWriter.ToString();
@@ -961,7 +1022,7 @@ namespace ADSS
                         if (ds != null && ds.Tables.Count > 0)
                         {
                             StatByDevice sbd = new StatByDevice();
-                            string sD = ""; 
+                            string sD = "";
                             int iIndex = -1;
                             // Desktop	2	21
                             for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
@@ -1000,7 +1061,7 @@ namespace ADSS
                                         break;
                                 }
 
-                                if (rp.moneyIssue && bl.Count > 0)
+                                if (rp.moneyIssue && bl != null && bl.Count > 0)
                                 {
                                     // step 3
                                     // calculate cost
@@ -1044,14 +1105,17 @@ namespace ADSS
                                     dr.cpm += sbd.ReportByDevice[i].cpm;
                                     dr.cpv += sbd.ReportByDevice[i].cpv;
                                 }
-
+                                // 2 precision
+                                dr.cpa = Convert.ToSingle(Math.Round(dr.cpa, 2));
+                                dr.cpm = Convert.ToSingle(Math.Round(dr.cpm, 2));
+                                dr.cpv = Convert.ToSingle(Math.Round(dr.cpv, 2));
                                 sbd.ReportByDevice.Add(dr);
                             }
 
                             if (String.Equals(rp.format, "xml", StringComparison.OrdinalIgnoreCase))
                             {
                                 XmlSerializer x = new XmlSerializer(sbd.GetType());
-                                using (StringWriter txtWriter = new StringWriter())
+                                using (StringWriter txtWriter = new Utf8StringWriter())
                                 {
                                     x.Serialize(txtWriter, sbd);
                                     strResult = txtWriter.ToString();
