@@ -731,9 +731,11 @@
                         "title": "Banner", "data": "url", "render": function (data, type, full, meta) {
                             var wordArray = CryptoJS.enc.Utf8.parse(data);
                             var base64 = CryptoJS.enc.Base64.stringify(wordArray);
-
-                            return '<a href="?t=as' + '&s=' + start + '&e=' + end + '&u=' + base64 + '" target="_blank"><img src="' + data + '" alt="banner"></a>';
-                            //return '<img src="' + data + '" alt="banner">';
+                            if (url)
+                                return '<img class="img-thumbnail" src="' + data + '" alt="banner">';
+                            else
+                                return '<a href="?t=as' + '&s=' + start + '&e=' + end + '&u=' + base64 + '" target="_blank"><img class="img-thumbnail" src="' + data + '" alt="banner"></a>';
+                            //return '<a href="' + data + '" target="_blank"><img src="' + data + '" alt="banner"></a>';
                         }
                     },
                     { "title": "Page", "data": "page" },
@@ -791,7 +793,7 @@
                             var wordArray = CryptoJS.enc.Utf8.parse(data);
                             var base64 = CryptoJS.enc.Base64.stringify(wordArray);
 
-                            return '<a href="?t=as' + '&s=' + start + '&e=' + end + '&u=' + base64 + '" target="_blank"><img src="' + data + '" alt="banner"></a>';
+                            return '<a href="?t=as' + '&s=' + start + '&e=' + end + '&u=' + base64 + '" target="_blank"><img class="img-thumbnail" src="' + data + '" alt="banner"></a>';
                             //return '<img src="' + data + '" alt="banner">';
                         }
                     },
