@@ -45,11 +45,17 @@ namespace ADSS
             public int n { get; set; }
             public int r { get; set; }
         }
+        private class Visitor
+        {
+            public int n { get; set; }
+            public int r { get; set; }
+        }
 
         private class DefaultInfo
         {
             public string period { get; set; }
             public Visit visit { get; set; }
+            public Visitor visitor { get; set; }
         }
 
         private class StatItem
@@ -606,8 +612,8 @@ namespace ADSS
                 string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, visit_time) >= '{0}'", startDate);
                 string strClause2 = String.IsNullOrEmpty(endDate) ? "" : string.Format(" and convert(date, visit_time) <= '{0}'", endDate);
                 //string strHead = "select DATEDIFF(SECOND,{d '1970-01-01'}, t3.d), t3.t, COUNT(t4.type)as c ";
-                string strHead = "select t3.d, t3.t, COUNT(t4.type)as c ";
-                strSQL = strHead + string.Format("from tb_page_visit_info_xango t4 right join (select * from (select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango  where distributor='{0}'{1}{2}) t1 ,(select distinct type as t from tb_page_visit_info_xango) t2 ) t3 on CAST(t4.visit_time as DATE) = t3.d and t4.type = t3.t and t4.distributor = '{0}' group by t3.d, t3.t order by t3.d, t3.t", distributor, strClause, strClause2);
+                string strHead = "select t3.d, t3.t, COUNT(distinct t4.token)as visitor, COUNT(t4.type) as pageview ";
+                strSQL = strHead + string.Format("from tb_page_visit_info_xango t4 right join (select '{3}' as dis, * from (select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango  where distributor='{0}'{1}{2}) t1 ,(select distinct type as t from tb_page_visit_info_xango) t2 ) t3 on CAST(t4.visit_time as DATE) = t3.d and t4.type = t3.t and t4.distributor = '{0}' group by t3.d, t3.t order by t3.d, t3.t", distributor, strClause, strClause2, distributor);
             }
             catch (Exception e)
             {
@@ -627,20 +633,26 @@ namespace ADSS
                             DefaultInfo di = null;
                             for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                             {
+                                // d,t,visitor,pageview(visit)
                                 DataRow r = ds.Tables[0].Rows[i];
                                 if (i % 2 == 0)
                                 {
                                     di = new DefaultInfo();
                                     di.visit = new Visit();
+                                    di.visitor = new Visitor();
                                 }
 
                                 //di.period = Convert.ToString(r[0]);
                                 di.period = ((DateTime)r[0]).ToString("yyyy-MM-dd");
                                 if (i % 2 == 0)
-                                    di.visit.n = Convert.ToInt32(r[2]);
+                                {
+                                    di.visit.n = Convert.ToInt32(r[3]);
+                                    di.visitor.n = Convert.ToInt32(r[2]);
+                                }
                                 else
                                 {
-                                    di.visit.r = Convert.ToInt32(r[2]);
+                                    di.visit.r = Convert.ToInt32(r[3]);
+                                    di.visitor.r = Convert.ToInt32(r[2]);
                                     dInfo.Add(di);
                                 }
                             }
@@ -676,11 +688,11 @@ namespace ADSS
                     labels.Add("Last Month");
                     if (ti != null)
                     {
-                        string strSQL1 = string.Format("select '{2}' as period, type, count(type) as count from tb_page_visit_info_xango where distributor = '{3}' and convert(date, visit_time) >= '{0}' and convert(date, visit_time) < '{1}' group by type;", ti.yesterday.start, ti.yesterday.end, "Yesterday", distributor);
-                        string strSQL2 = string.Format("select '{2}' as period, type, count(type) as count from tb_page_visit_info_xango where distributor = '{3}' and convert(date, visit_time) >= '{0}' and convert(date, visit_time) < '{1}' group by type;", ti.last_7_days.start, ti.last_7_days.end, "Last 7 days", distributor);
-                        string strSQL3 = string.Format("select '{2}' as period, type, count(type) as count from tb_page_visit_info_xango where distributor = '{3}' and convert(date, visit_time) >= '{0}' and convert(date, visit_time) < '{1}' group by type;", ti.last_30_days.start, ti.last_7_days.end, "Last 30 days", distributor);
-                        string strSQL4 = string.Format("select '{2}' as period, type, count(type) as count from tb_page_visit_info_xango where distributor = '{3}' and convert(date, visit_time) >= '{0}' and convert(date, visit_time) <= '{1}' group by type;", ti.this_month.start, ti.this_month.end, "This month", distributor);
-                        string strSQL5 = string.Format("select '{2}' as period, type, count(type) as count from tb_page_visit_info_xango where distributor = '{3}' and convert(date, visit_time) >= '{0}' and convert(date, visit_time) <= '{1}' group by type;", ti.last_month.start, ti.last_month.end, "Last month", distributor);
+                        string strSQL1 = string.Format("select '{2}' as period, type, COUNT(distinct token) as cnt, COUNT(type) as cnt_v from tb_page_visit_info_xango where distributor = '{3}' and convert(date, visit_time) >= '{0}' and convert(date, visit_time) < '{1}' group by type;", ti.yesterday.start, ti.yesterday.end, "Yesterday", distributor);
+                        string strSQL2 = string.Format("select '{2}' as period, type, COUNT(distinct token) as cnt, COUNT(type) as cnt_v from tb_page_visit_info_xango where distributor = '{3}' and convert(date, visit_time) >= '{0}' and convert(date, visit_time) < '{1}' group by type;", ti.last_7_days.start, ti.last_7_days.end, "Last 7 days", distributor);
+                        string strSQL3 = string.Format("select '{2}' as period, type, COUNT(distinct token) as cnt, COUNT(type) as cnt_v from tb_page_visit_info_xango where distributor = '{3}' and convert(date, visit_time) >= '{0}' and convert(date, visit_time) < '{1}' group by type;", ti.last_30_days.start, ti.last_7_days.end, "Last 30 days", distributor);
+                        string strSQL4 = string.Format("select '{2}' as period, type, COUNT(distinct token) as cnt, COUNT(type) as cnt_v from tb_page_visit_info_xango where distributor = '{3}' and convert(date, visit_time) >= '{0}' and convert(date, visit_time) <= '{1}' group by type;", ti.this_month.start, ti.this_month.end, "This month", distributor);
+                        string strSQL5 = string.Format("select '{2}' as period, type, COUNT(distinct token) as cnt, COUNT(type) as cnt_v from tb_page_visit_info_xango where distributor = '{3}' and convert(date, visit_time) >= '{0}' and convert(date, visit_time) <= '{1}' group by type;", ti.last_month.start, ti.last_month.end, "Last month", distributor);
 
                         string strSQL = strSQL1 + strSQL2 + strSQL3 + strSQL4 + strSQL5;
                         using (SqlConnection sc = new SqlConnection(ConfigurationManager.ConnectionStrings["sqlserver"].ConnectionString))
@@ -695,10 +707,12 @@ namespace ADSS
                                     {
                                         DefaultInfo di = new DefaultInfo();
                                         di.visit = new Visit();
+                                        di.visitor = new Visitor();
                                         if (ds.Tables[i].Rows.Count == 0)
                                         {
                                             di.period = labels[i];
                                             di.visit.n = di.visit.r = 0;
+                                            di.visitor.n = di.visitor.r = 0;
                                         }
                                         else
                                         {
@@ -708,9 +722,15 @@ namespace ADSS
                                                 DataRow r = ds.Tables[i].Rows[j];
                                                 di.period = Convert.ToString(r[0]);
                                                 if (String.Compare("new", Convert.ToString(r[1]), StringComparison.OrdinalIgnoreCase) == 0)
-                                                    di.visit.n = Convert.ToInt32(r[2]);
+                                                {
+                                                    di.visitor.n = Convert.ToInt32(r[2]);
+                                                    di.visit.n = Convert.ToInt32(r[3]);
+                                                }
                                                 else if (String.Compare("return", Convert.ToString(r[1]), StringComparison.OrdinalIgnoreCase) == 0)
-                                                    di.visit.r = Convert.ToInt32(r[2]);
+                                                {
+                                                    di.visitor.r = Convert.ToInt32(r[2]);
+                                                    di.visit.r = Convert.ToInt32(r[3]);
+                                                }
                                             }
                                         }
                                         dInfo.Add(di);

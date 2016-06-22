@@ -181,10 +181,15 @@
                         }
                     },
                     { "title": "Period", "data": "period" },
-                    { "title": "New Visitors", "data": "visit.n" },
-                    { "title": "Return Visitors", "data": "visit.r" },
+                    { "title": "New Visitors", "data": "visitor.n" },
+                    { "title": "Return Visitors", "data": "visitor.r" },
                     {
-                        "title": "Total Visitors", "data": "visit", "render": function (data, type, full, meta) {
+                        "title": "Total Visitors", "data": "visitor", "render": function (data, type, full, meta) {
+                            return data.r + data.n;
+                        }
+                    },
+                    {
+                        "title": "Total PageView", "data": "visit", "render": function (data, type, full, meta) {
                             return data.r + data.n;
                         }
                     }
@@ -396,10 +401,15 @@
                                         return data;
                                     }
                                 },
-                                { "title": "New Visitors", "data": "visit.n" },
-                                { "title": "Return Visitors", "data": "visit.r" },
+                                { "title": "New Visitors", "data": "visitor.n" },
+                                { "title": "Return Visitors", "data": "visitor.r" },
                                 {
-                                    "title": "Total Visitors", "data": "visit", "render": function (data, type, full, meta) {
+                                    "title": "Total Visitors", "data": "visitor", "render": function (data, type, full, meta) {
+                                        return data.r + data.n;
+                                    }
+                                },
+                                {
+                                    "title": "Total PageView", "data": "visit", "render": function (data, type, full, meta) {
                                         return data.r + data.n;
                                     }
                                 }
@@ -438,18 +448,18 @@
                             //var mDate = moment.unix(parseInt(entry.period))
                             var mDate = moment(entry.period, "YYYY-MM-DD");
                             d.push(mDate.format("YY-MMM-DD"));
-                            d.push(entry.visit.n);
+                            d.push(entry.visitor.n);
                             var wDay = mDate.day();
                             if (wDay === 6 || wDay === 0)
                                 d.push(style_weekend);
                             else
                                 d.push(style_normal);
-                            d.push(entry.visit.r);
+                            d.push(entry.visitor.r);
                             if (wDay === 6 || wDay === 0)
                                 d.push(style_weekend);
                             else
                                 d.push(style_normal);
-                            d.push(entry.visit.n + entry.visit.r);
+                            d.push(entry.visitor.n + entry.visitor.r);
                             if (wDay === 6 || wDay === 0)
                                 d.push(style_weekend);
                             else
@@ -463,7 +473,7 @@
                             else
                                 $('#chart-stat').addClass('hide-element');
                             var options = {
-                                title: "Daily Page Visit",
+                                title: "Daily Visitors",
                                 width: '100%',
                                 height: '100%',
                                 axisTitlesPosition: 'out',

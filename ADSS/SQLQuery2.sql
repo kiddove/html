@@ -123,13 +123,18 @@ select * from (select distinct CAST(visit_time as DATE) as d from tb_page_visit_
 
 select t3.d, t3.t, COUNT(t4.type)as c from tb_page_visit_info_xango t4 right join (select * from (select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango  where visit_time < '2016-01-01') t1 ,(select distinct type as t from tb_page_visit_info_xango) t2 ) t3 on CAST(t4.visit_time as DATE) = t3.d and t4.type = t3.t group by t3.d, t3.t order by t3.d, t3.t
 
+select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango  where distributor='paul' and visit_time >= '2016-05-05' and visit_time <= '2016-06-03'
+select distinct type as t from tb_page_visit_info_xango
+select 'kectech' as dis, * from (select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango  where distributor='kectech' and visit_time >= '2016-06-05' and visit_time <= '2016-07-03') t1 ,(select distinct type as t from tb_page_visit_info_xango) t2
+order by d, t
 
-select DATEDIFF(SECOND,{d '1970-01-01'}, t3.d), t3.d, t3.t, COUNT(t4.type)as c 
+
+select t3.d, t3.t, COUNT(distinct t4.token)as visitor, COUNT(t4.type) as pageview
 from tb_page_visit_info_xango t4 
 right join 
-(select * from (select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango  where distributor='paul' and visit_time >= '2016-05-05' and visit_time <= '2016-06-03') t1 ,(select distinct type as t from tb_page_visit_info_xango) t2 ) t3 
-on CAST(t4.visit_time as DATE) = t3.d and t4.type = t3.t 
-group by t3.d, t3.t 
+(select 'kectech' as dis, * from (select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango  where distributor='kectech' and visit_time >= '2016-06-05' and visit_time <= '2016-07-03') t1 ,(select distinct type as t from tb_page_visit_info_xango) t2) t3 
+on CAST(t4.visit_time as DATE) = t3.d and t4.type = t3.t and t4.distributor = t3.dis
+group by t3.d, t3.t
 order by t3.d, t3.t
 
 DATEDIFF(SECOND,{d '1970-01-01'}, visit_time)
@@ -145,12 +150,20 @@ select page, COUNT(*) as count, COUNT(*) * 100.0 / SUM(COUNT(*)) over() as perce
 
 select top 5 page, COUNT(*) as count, COUNT(*) / SUM(COUNT(*)) over() as percentage from tb_page_visit_info_xango where distributor='paul' and visit_time >= '2016-05-05' and visit_time <= '2016-06-03' group by page order by percentage desc
 
+select LEN('/xango/healthyone/blog/chapter-1-introduction-man-thought-way-partnership-thomas-edison-chapter-2-desire-starting-point-achievement-first-step-toward-riches/')
+
+select page, visit_time from tb_page_visit_info_xango order by visit_time desc
+
+select distinct page, len(page) from tb_page_visit_info_xango where page like '/xango/%/blog/%' and page not like '/xango/%/'
+
+--update tb_page_visit_info_xango
+--  set page = '/xango/healthylife/blog/%e5%b1%b1%e7%ab%b9%e6%9e%9c%e7%9b%b8%e9%97%9c%e7%a0%94%e7%a9%b6-%e5%9c%8b%e9%9a%9b%e6%96%87%e7%8d%bb%e5%88%97%e8%a1%a8/'
+--where page = '/xango/healthylife/blog/%E5%B1%B1%E7%AB%B9%E6%9E%9C%E7%9B%B8%E9%'
+-- where page = '/xango/healthyone/blog/chapter-1-introduction-man-thought-way-pa'
 
 
-select type, visit_time from tb_page_visit_info_xango order by visit_time desc
+select count(*) from (select distinct token ,type, CAST(visit_time as DATE) from tb_page_visit_info_xango where type = 'return' group by token, type, visit_time ) a
 
 
-
-
-
-insert into tb_page_visit_info_xango (token, ip, agent, language, color_depth, screen_resolution, time_zone, platform, device, os, country, province, city, province_code, refer, page, distributor) values ('949f7ba7f862fd334ac38a1e3c59d1f7', '174.117.34.102', 'Chrome 51', 'en-US', 24, '1080x1920', 240, 'Win32', 'Desktop', 'Windows 7', 'Canada', 'Ontario', 'Toronto', 'ON', 'http://206.190.141.88/ShowRoomMF.aspx', '/BusinessShowRoom.aspx', 'kectech')
+select token, type from tb_page_visit_info_xango where CAST(visit_time as DATE) = '2016-06-21' and distributor = 'kectech' group by token, type
+select 'yesterday' as period, type, COUNT(distinct token) as c, COUNT(type) as v from tb_page_visit_info_xango where distributor = 'kectech' and convert(date, visit_time) >= '2016-06-22' and convert(date, visit_time) <= '2016-06-22' group by type;

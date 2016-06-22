@@ -57,7 +57,7 @@ select distinct(province_code) from tb_page_visit_info_xango  order by visit_tim
 select province, city from tb_page_visit_info_xango where province_code = '35'
 
 
-select 'yesterday' as period, type, count(type) as count from tb_page_visit_info_xango where distributor = 'kectech' and convert(date, visit_time) >= '2016-06-13' and convert(date, visit_time) <= '2016-06-13' group by type;
+select 'yesterday' as period, type, count(type) as count from tb_page_visit_info_xango where distributor = 'kectech' and convert(date, visit_time) >= '2016-06-16' and convert(date, visit_time) <= '2016-06-16' group by type;
 
 
 select * from tb_page_visit_info_xango where distributor in ('kectech', 'healthylife') order by visit_time desc
