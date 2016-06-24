@@ -8,7 +8,7 @@
  */
 
 /*http://stackoverflow.com/questions/27507876/twitter-bootstrap-3-3-1-datatables-always-horizontal-scrollable*/
-.table-responsive {
+.myContent .table-responsive {
     overflow-x: inherit;
 }
 
@@ -55,23 +55,37 @@ tbody td.return-visitor {
 
 .myContent {
     margin-bottom: 20px;
+    letter-spacing: initial;
+    padding-left: 1px;
+    padding-right: 1px;
 }
+
+    .myContent .container-fluid {
+        padding-left: initial;
+        padding-right: initial;
+    }
+
+    .myContent .navbar-header {
+        padding-left: 15px;
+    }
 
     .myContent .navbar.navbar-inverse {
         background-color: #6B9BF5;
         border-color: transparent;
     }
 
-        .myContent .navbar.navbar-inverse .navbar-brand, .myContent .navbar-inverse .navbar-nav > li > a {
+        .myContent .navbar.navbar-inverse .navbar-brand,
+        .myContent .navbar-inverse .navbar-nav > li > a {
             color: white;
         }
 
-            .myContent .navbar.navbar-inverse .navbar-brand:hover, .myContent .navbar-inverse .navbar-nav > li > a:hover {
-                color: #282828;
+            .myContent .navbar.navbar-inverse .navbar-brand:hover,
+            .myContent .navbar-inverse .navbar-nav > li > a:hover {
+                color: #333;
             }
 
             .myContent .navbar-inverse .navbar-nav > li > a.type-selected {
-                color: #282828;
+                color: #333;
             }
 
     .myContent table td img {
@@ -79,7 +93,9 @@ tbody td.return-visitor {
         width: 6em;
     }
 
-    .myContent .navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:focus, .navbar-inverse .navbar-nav > .open > a:hover {
+    .myContent .navbar-inverse .navbar-nav > .open > a,
+    .myContent .navbar-inverse .navbar-nav > .open > a:focus,
+    .myContent .navbar-inverse .navbar-nav > .open > a:hover {
         background-color: #6B9BF5;
     }
 
@@ -92,6 +108,15 @@ tbody td.return-visitor {
         -webkit-transition: all 0.7s ease;
         transition: all 0.7s ease;
     }
+
+    .myContent .navbar-inverse .navbar-toggle {
+        border-color: transparent;
+    }
+
+    .myContent .table {
+        max-width: initial;
+    }
+
 .mega-menu,
 .mega-menu:before,
 .mega-menu:after,
@@ -108,3 +133,13 @@ tbody td.return-visitor {
         margin-right: 0px;
         margin-left: 0px;
     }
+
+@media (max-width: 767px) {
+    .myContent .navbar-inverse .navbar-nav .open .dropdown-menu > li > a {
+        color: white;
+    }
+
+        .myContent .navbar-inverse .navbar-nav .open .dropdown-menu > li > a:hover {
+            color: #333;
+        }
+}

@@ -115,7 +115,7 @@
 
         function RefreshNavBar(usr, start, end) {
             //$('.navbar-brand').attr('href', '?d=' + usr);
-            $('.navbar-brand').attr('href', '/TrafficLeads.aspx');
+            $('.navbar-brand').attr('href', window.location.origin + window.location.pathname);
             $("#navbar > ul").children().each(function () {
                 switch ($(this).index()) {
                     case 0:
@@ -215,6 +215,7 @@
                 //},
                 "initComplete": function (settings, json) {
                     $("#test_wrapper").append(spinner);
+                    $("#test").css("width", "100%");
                 }
             });
         }
@@ -355,6 +356,7 @@
                 },
                 "initComplete": function (settings, json) {
                     $("#test_wrapper").append(spinner);
+                    $("#test").css("width", "100%");
                 },
                 "sScrollX": "100%",
                 "bScrollCollapse": true,
@@ -435,7 +437,10 @@
                             //},
                             "initComplete": function (settings, json) {
                                 $("#test_wrapper").append(spinner);
-                            }
+                                $("#test").css("width", "100%");
+                            },
+                            "sScrollX": "100%",
+                            "bScrollCollapse": true,
                         });
                         table.order([1, 'asc']).draw();
 
@@ -480,11 +485,11 @@
                                 //'isStacked': true,
                                 pieSliceText: 'percentage',
                                 colors: ['#FF6161', '#1AA35F', '#1A87D1'],
-                                //colors: ['#97C774', '#B63E98', '#D18E62', '#DB3E41', '#1BABA5'],
+                                //colors: ['#FF6161', '#97C774', '#B63E98', '#D18E62', '#DB3E41', '#1BABA5', '#CE7676'],
                                 chartArea: {
-                                    left: "5%",
+                                    left: "8%",
                                     top: "10%",
-                                    right: "20%",
+                                    right: "14%",
                                     bottom: "30%",
                                     height: "85%",
                                     width: "80%"
@@ -538,7 +543,7 @@
                     if (dataSet != null) {
                         var table = $('#test').DataTable({
                             "destroy": true,
-                            "data": dataSet,
+                            "data": dataSet.list,
                             "columns": [
                                 { "title": "Page", "data": "page" },
                                 { "title": "Visit", "data": "count" },
@@ -553,34 +558,52 @@
                             //"lengthMenu": [10, 30, 50],
                             "initComplete": function (settings, json) {
                                 $("#test_wrapper").append(spinner);
-                            }
+                                $("#test").css("width", "100%");
+                            },
+                            "sScrollX": "100%",
+                            "bScrollCollapse": true,
                         });
                         table.order([1, 'desc']).draw();
 
                         var chartData = [];
+                        var rest = 0;
                         chartData.push(['Page', 'Visit']);
-                        dataSet.forEach(function (entry) {
+                        dataSet.list.forEach(function (entry) {
                             var d = [];
                             d.push(entry.page);
                             d.push(entry.count);
                             chartData.push(d);
+                            rest += entry.count;
                         });
+                        chartData.push(["Others", dataSet.total - rest]);
+
 
                         function drawPvChart() {
-                            if (dataSet.length > 0)
+
+                            var pieTitle = "Page View Chart";
+                            if (dataSet.list.length > 0)
                                 $('#chart-stat').removeClass('hide-element');
                             else
                                 $('#chart-stat').addClass('hide-element');
                             var options = {
-                                title: "Page View Chart",
+                                title: pieTitle,
+                                titlePosition: "out",
                                 width: '100%',
                                 height: '100%',
                                 is3D: true,
-                                colors: ['#FF6161', '#1AA35F', '#1A87D1', '#8381DA', '#675874'],
+                                //colors: ['#FF6161', '#1AA35F', '#1A87D1', '#C39BD3', '#675874', '#97C774', '#B63E98', '#D18E62', '#8381DA', '#581845', '#0C6B65'],
+                                //colors: ['#C0392B', '#E74C3C', '#9B59B6', '#8E44AD', '#2980B9', '#3498DB', '#1ABC9C', '#16A085', '#27AE60', '#2ECC71', '#34495E', '#2C3E50', '#D35400', '#E67E22'],
+                                colors: [
+                                    '#FF6161', '#1AA35F', '#1A87D1',
+                                    '#9B59B6', '#1ABC9C', '#566573',
+                                    '#D6428A', '#586E36', '#44B2AF',
+                                    '#A2393B', '#2ECC71', '#2C3E50',
+                                ],
+                                //colors: ['#97C774', '#B63E98', '#D18E62', '#DB3E41', '#1BABA5'],8381DA
                                 chartArea: {
-                                    left: "5%",
+                                    left: "3%",
                                     top: "5%",
-                                    right: "20%",
+                                    right: "5%",
                                     bottom: "5%",
                                     height: "100%",
                                     width: "100%"
@@ -592,6 +615,7 @@
 
                             // Create and draw the visualization.
                             new google.visualization.PieChart(document.getElementById('chart-stat')).draw(data, options);
+                            //$("text:contains(" + pieTitle + ")").attr({ 'x': '1' });
                         };
 
                         function draw() {
@@ -624,7 +648,7 @@
                     if (dataSet != null) {
                         var table = $('#test').DataTable({
                             "destroy": true,
-                            "data": dataSet,
+                            "data": dataSet.list,
                             "columns": [
                                {
                                    "title": "Referrer", "data": "page", "render": function (data, type, full, meta) {
@@ -650,14 +674,18 @@
                             //"lengthMenu": [10, 30, 50],
                             "initComplete": function (settings, json) {
                                 $("#test_wrapper").append(spinner);
-                            }
+                                $("#test").css("width", "100%");
+                            },
+                            "sScrollX": "100%",
+                            "bScrollCollapse": true,
                         });
                         table.order([1, 'desc']).draw();
 
                         var chartData = [];
                         chartData.push(['Referrer', 'Visit']);
                         // IE8 do NOT support foreach...., neither google chart.
-                        dataSet.forEach(function (entry) {
+                        var rest = 0;
+                        dataSet.list.forEach(function (entry) {
                             var d = [];
                             if (entry.page)
                                 d.push(entry.page);
@@ -665,24 +693,34 @@
                                 d.push("Direct Access");
                             d.push(entry.count);
                             chartData.push(d);
+                            rest += entry.count;
                         });
 
+                        chartData.push(["others", dataSet.total - rest]);
+
                         function drawToChart() {
-                            if (dataSet.length > 0)
+                            var pieTitle = "Referrer Chart"
+                            if (dataSet.list.length > 0)
                                 $('#chart-stat').removeClass('hide-element');
                             else
                                 $('#chart-stat').addClass('hide-element');
                             var options = {
-                                title: "Referrer Chart",
+                                title: pieTitle,
+                                titlePosition: "out",
                                 width: '100%',
                                 height: '100%',
                                 is3D: true,
-                                colors: ['#FF6161', '#1AA35F', '#1A87D1', '#8381DA', '#675874'],
+                                colors: [
+                                    '#FF6161', '#1AA35F', '#1A87D1',
+                                    '#9B59B6', '#1ABC9C', '#566573',
+                                    '#D6428A', '#586E36', '#44B2AF',
+                                    '#A2393B', '#2ECC71', '#2C3E50',
+                                ],
                                 //colors: ['#97C774', '#B63E98', '#D18E62', '#DB3E41', '#1BABA5'],
                                 chartArea: {
-                                    left: "5%",
+                                    left: "3%",
                                     top: "5%",
-                                    right: "20%",
+                                    right: "5%",
                                     bottom: "5%",
                                     height: "100%",
                                     width: "100%"
@@ -694,6 +732,8 @@
 
                             // Create and draw the visualization.
                             new google.visualization.PieChart(document.getElementById('chart-stat')).draw(data, options);
+
+                            //$("text:contains(" + pieTitle + ")").attr({ 'x': '1' });
                         };
 
                         function draw() {
@@ -771,6 +811,7 @@
                 "lengthMenu": [20, 50, 80],
                 "initComplete": function (settings, json) {
                     $("#test_wrapper").append(spinner);
+                    $("#test").css("width", "100%");
                 }
             });
 
@@ -823,6 +864,7 @@
                 "lengthMenu": [20, 50, 80],
                 "initComplete": function (settings, json) {
                     $("#test_wrapper").append(spinner);
+                    $("#test").css("width", "100%");
                 }
             });
 
@@ -848,7 +890,7 @@
             endDate: moment(endDate, "YYYY-MM-DD")
         }, cb);
 
-        $('#todo').html('<table id="test" class="hover order-column table-bordered"></table>');
+        $('#todo').html('<table id="test" class="hover order-column table-bordered table"></table>');
         $('#reportrange').addClass('hide-element');
         if (distributor) {
             RefreshNavBar(distributor, startDate, endDate);
@@ -866,7 +908,7 @@
                     $('#tot').addClass('type-selected');
                 } else if (pageType.toLowerCase() === 'pv') {
                     // page view
-                    $("#title").html('Page Views(Top 5)');
+                    $("#title").html('Page Views(Top 10)');
                     InitPageView(distributor, pageType, startDate, endDate);
                     $('#pv').addClass('type-selected');
                 } else if (pageType.toLowerCase() === 'to') {

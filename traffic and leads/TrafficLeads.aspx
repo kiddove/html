@@ -23,10 +23,6 @@
     <script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css" />
 
-    <!--datatable with fixed header and responsive-->
-    <!--    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/t/dt/dt-1.10.11,fh-3.1.1,r-2.0.2/datatables.min.css" />
-    <script type="text/javascript" src="https://cdn.datatables.net/t/dt/dt-1.10.11,fh-3.1.1,r-2.0.2/datatables.min.js"></script>-->
-
     <!--Parse, validate, manipulate, and display dates in JavaScript. http://momentjs.com/-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
 
@@ -87,7 +83,7 @@
         </nav>
 
         <div class="container-fluid">
-            <h2 id="title" style="float: left">Quick Stats</h2>
+            <h3 id="title" style="float: left">Quick Stats</h3>
             <div id="reportrange" class="range-picker pull-left">
                 <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
                 <span></span><b class="caret"></b>

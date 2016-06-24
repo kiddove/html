@@ -65,6 +65,8 @@
                     }
                 });
             }
+
+            $('#hfToken').attr('value', result);
         });
 
         if ($('#dlLImgList img').length > 0) {
