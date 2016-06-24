@@ -31,14 +31,6 @@ namespace ADSS
             public TimePair last_30_days { get; set; }
             public TimePair this_month { get; set; }
             public TimePair last_month { get; set; }
-
-            //public TimeInterval()
-            //{
-            //    yesterday = new TimePair();
-            //    last_7_days = new TimePair();
-            //    this_month = new TimePair();
-            //    last_month = new TimePair();
-            //}
         }
         private class Visit
         {
@@ -50,14 +42,12 @@ namespace ADSS
             public int n { get; set; }
             public int r { get; set; }
         }
-
         private class DefaultInfo
         {
             public string period { get; set; }
             public Visit visit { get; set; }
             public Visitor visitor { get; set; }
         }
-
         private class StatItem
         {
             public string country { get; set; }
@@ -67,7 +57,6 @@ namespace ADSS
             public string time { get; set; }
             public string ip { get; set; }
         }
-
         private class AdsStatItem
         {
             public string url { get; set; }
@@ -75,19 +64,17 @@ namespace ADSS
             public string time { get; set; }
             public int count { get; set; }
         }
-
         private class PageViewItem
         {
             public string page { get; set; }
             public int count { get; set; }
             public string percentage { get; set; }
         }
-        //struct AnalyticsIdentity
-        //{
-        //    public string token { get; set; }
-        //    public string alias { get; set; }
-        //}
-
+        private class TopFiveStat
+        {
+            public List<PageViewItem> list { get; set; }
+            public int total { get; set; }
+        }
         private class PageAnalysisInfo
         {
             //public AnalyticsIdentity identity;
@@ -111,7 +98,6 @@ namespace ADSS
             public string distributor { get; set; }
             public string blog { get; set; }
         }
-
         private class UploadFingerPrint : UserFingerPrint
         {
             //public string alias { get; set; }   //trigger
@@ -219,7 +205,7 @@ namespace ADSS
         private string getAdsQuickStat(string distributor, string startDate, string endDate, string blog)
         {
             combineBlogDistributor(blog, distributor);
-            string strSQL;
+            string strSQL = "";
             try
             {
                 string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, click_time) >= '{0}'", startDate);
@@ -260,7 +246,7 @@ namespace ADSS
             catch (Exception e)
             {
                 //Trace.WriteLine(e.Message);
-                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getAdsQuickStat) --- Exception: " + e.Message);
+                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getAdsQuickStat) --- Exception: " + e.Message + " --- sql: " + strSQL);
             }
 
             return "{}";
@@ -269,7 +255,7 @@ namespace ADSS
         private string getAdsStat(string distributor, string startDate, string endDate, string blog, string url)
         {
             combineBlogDistributor(blog, distributor);
-            string strSQL;
+            string strSQL = "";
             try
             {
                 string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, click_time) >= '{0}'", startDate);
@@ -317,7 +303,7 @@ namespace ADSS
             catch (Exception e)
             {
                 //Trace.WriteLine(e.Message);
-                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getAdsStat) --- Exception: " + e.Message);
+                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getAdsStat) --- Exception: " + e.Message + " --- sql: " + strSQL);
             }
 
             return "{}";
@@ -331,7 +317,7 @@ namespace ADSS
                 UploadAdsStat uas = js.Deserialize<UploadAdsStat>(strJson);
                 if (!string.IsNullOrEmpty(uas.url))
                 {
-                    string strSQL;
+                    string strSQL = "";
 
                     if (!string.IsNullOrEmpty(uas.blog))
                     {
@@ -357,7 +343,7 @@ namespace ADSS
                         catch (Exception e)
                         {
                             //Trace.WriteLine(e.Message);
-                            AdssLogger.WriteLog("GetSampleAnalyticsInfo(getTrfficOrigin) --- Exception: " + e.Message);
+                            AdssLogger.WriteLog("GetSampleAnalyticsInfo(updateTableAds) --- Exception: " + e.Message + " --- sql: " + strSQL);
                         }
                     }
 
@@ -373,7 +359,7 @@ namespace ADSS
                         }
                         catch (Exception e)
                         {
-                            AdssLogger.WriteLog("Exception in updateTableAds(): " + e.Message);
+                            AdssLogger.WriteLog("Exception in updateTableAds(): " + e.Message + " --- sql: " + strSQL);
                         }
                     }
                 }
@@ -416,14 +402,14 @@ namespace ADSS
                         }
                         catch (Exception e)
                         {
-                            AdssLogger.WriteLog("Exception in updateTable(): " + e.Message + " --- sql: " + strSQL);
+                            AdssLogger.WriteLog("Exception in updateTableFromShowRoom(): " + e.Message + " --- sql: " + strSQL);
                         }
                     }
                 }
                 catch (Exception e)
                 {
                     //System.Diagnostics.Trace.WriteLine(e.Message);
-                    AdssLogger.WriteLog("Exception in Deserialize(): " + e.Message);
+                    AdssLogger.WriteLog("Exception in Deserialize(): " + e.Message + " --- json: " + strJson);
                 }
 
 
@@ -447,7 +433,7 @@ namespace ADSS
                     uf.province_code = string.IsNullOrEmpty(gl.region_code) ? "all" : gl.region_code;
                     uf.ip = gl.ip;
                     // visit_time, alias, type
-                    string strSQL;
+                    string strSQL = "";
 
                     if (!string.IsNullOrEmpty(uf.blog))
                     {
@@ -473,7 +459,7 @@ namespace ADSS
                         catch (Exception e)
                         {
                             //Trace.WriteLine(e.Message);
-                            AdssLogger.WriteLog("GetSampleAnalyticsInfo(getTrfficOrigin) --- Exception: " + e.Message);
+                            AdssLogger.WriteLog("GetSampleAnalyticsInfo(updateTableFromBlog) --- Exception: " + e.Message + " --- sql: " + strSQL);
                         }
 
                         strSQL = string.Format("insert into tb_page_visit_info_xango (token, ip, agent, language, color_depth, screen_resolution, time_zone, platform, device, os, country, province, city, province_code, refer, page, distributor) values ('{0}', '{1}', '{2}', '{3}', {4}, '{5}', {6}, '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}', '{14}', '{15}', '{16}')",
@@ -487,7 +473,7 @@ namespace ADSS
                             }
                             catch (Exception e)
                             {
-                                AdssLogger.WriteLog("Exception in updateTable(): " + e.Message + " --- sql: " + strSQL);
+                                AdssLogger.WriteLog("Exception in updateTableFromBlog(): " + e.Message + " --- sql: " + strSQL);
                             }
                         }
                     }
@@ -495,7 +481,7 @@ namespace ADSS
                 catch (Exception e)
                 {
                     //System.Diagnostics.Trace.WriteLine(e.Message);
-                    AdssLogger.WriteLog("Exception in Deserialize(): " + e.Message);
+                    AdssLogger.WriteLog("Exception in Deserialize(): " + e.Message + " --- json: " + strJson);
                 }
 
 
@@ -506,12 +492,12 @@ namespace ADSS
         private string getTrfficOrigin(string distributor, string startDate, string endDate)
         {
             // select distinct(refer), COUNT(id) as visit from tb_page_visit_info_xango where distributor='paul' and visit_time >= '2016-05-05' and visit_time <= '2016-06-03' group by refer order by visit desc
-            string strSQL;
+            string strSQL = "";
             try
             {
                 string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, visit_time) >= '{0}'", startDate);
                 string strClause2 = String.IsNullOrEmpty(endDate) ? "" : string.Format(" and convert(date, visit_time) <= '{0}'", endDate);
-                strSQL = string.Format("select top 5 refer, COUNT(*) as visit, COUNT(*) * 1.0/ SUM(COUNT(*)) over() as percentage from tb_page_visit_info_xango where distributor='{0}'{1}{2} group by refer order by percentage desc", distributor, strClause, strClause2);
+                strSQL = string.Format("select top 5 refer, COUNT(*) as visit, COUNT(*) * 1.0/ SUM(COUNT(*)) over() as percentage, SUM(COUNT(*)) over() as total from tb_page_visit_info_xango where distributor='{0}'{1}{2} group by refer order by percentage desc", distributor, strClause, strClause2);
             }
             catch (Exception e)
             {
@@ -528,7 +514,8 @@ namespace ADSS
                         DataSet ds = SqlHelper.ExecuteDataset(sc, CommandType.Text, strSQL);
                         if (ds != null && ds.Tables.Count > 0)
                         {
-                            List<PageViewItem> pList = new List<PageViewItem>();
+                            TopFiveStat tfs = new TopFiveStat();
+                            tfs.list = new List<PageViewItem>();
                             for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                             {
                                 DataRow r = ds.Tables[0].Rows[i];
@@ -536,9 +523,10 @@ namespace ADSS
                                 pv.page = Convert.ToString(r[0]);
                                 pv.count = Convert.ToInt32(r[1]);
                                 pv.percentage = string.Format("{0:P2}", Convert.ToSingle(r[2]));
-                                pList.Add(pv);
+                                tfs.list.Add(pv);
+                                tfs.total = Convert.ToInt32(r[3]);
                             }
-                            return new JavaScriptSerializer().Serialize(pList);
+                            return new JavaScriptSerializer().Serialize(tfs);
                         }
                     }
                 }
@@ -546,7 +534,7 @@ namespace ADSS
             catch (Exception e)
             {
                 //Trace.WriteLine(e.Message);
-                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getTrfficOrigin) --- Exception: " + e.Message);
+                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getTrfficOrigin) --- Exception: " + e.Message + " --- sql: " + strSQL);
             }
 
             return "{}";
@@ -561,7 +549,7 @@ namespace ADSS
             {
                 string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, visit_time) >= '{0}'", startDate);
                 string strClause2 = String.IsNullOrEmpty(endDate) ? "" : string.Format(" and convert(date, visit_time) <= '{0}'", endDate);
-                strSQL = string.Format("select top 5 page, COUNT(*) as visit, COUNT(*) * 1.0 / SUM(COUNT(*)) over() as percentage from tb_page_visit_info_xango where distributor='{0}'{1}{2} group by page order by percentage desc", distributor, strClause, strClause2);
+                strSQL = string.Format("select top 10 page, COUNT(*) as visit, COUNT(*) * 1.0 / SUM(COUNT(*)) over() as percentage, SUM(COUNT(*)) over() as total from tb_page_visit_info_xango where distributor='{0}'{1}{2} group by page order by percentage desc", distributor, strClause, strClause2);
             }
             catch (Exception e)
             {
@@ -578,7 +566,8 @@ namespace ADSS
                         DataSet ds = SqlHelper.ExecuteDataset(sc, CommandType.Text, strSQL);
                         if (ds != null && ds.Tables.Count > 0)
                         {
-                            List<PageViewItem> pList = new List<PageViewItem>();
+                            TopFiveStat tfs = new TopFiveStat();
+                            tfs.list = new List<PageViewItem>();
                             for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                             {
                                 DataRow r = ds.Tables[0].Rows[i];
@@ -586,9 +575,10 @@ namespace ADSS
                                 pv.page = Convert.ToString(r[0]);
                                 pv.count = Convert.ToInt32(r[1]);
                                 pv.percentage = string.Format("{0:P2}", Convert.ToSingle(r[2]));
-                                pList.Add(pv);
+                                tfs.list.Add(pv);
+                                tfs.total = Convert.ToInt32(r[3]);
                             }
-                            return new JavaScriptSerializer().Serialize(pList);
+                            return new JavaScriptSerializer().Serialize(tfs);
                         }
                     }
                 }
@@ -596,7 +586,7 @@ namespace ADSS
             catch (Exception e)
             {
                 //Trace.WriteLine(e.Message);
-                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getPageView) --- Exception: " + e.Message);
+                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getPageView) --- Exception: " + e.Message + " --- sql: " + strSQL);
             }
 
             return "{}";
@@ -664,7 +654,7 @@ namespace ADSS
             catch (Exception e)
             {
                 //Trace.WriteLine(e.Message);
-                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getTrafficOverTime sql excute) --- Exception: " + e.Message);
+                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getTrafficOverTime sql excute) --- Exception: " + e.Message + " --- sql: " + strSQL);
             }
             return "{}";
         }
@@ -675,6 +665,7 @@ namespace ADSS
                 return "{}";
             else
             {
+                string strSQL = "";
                 try
                 {
                     JavaScriptSerializer js = new JavaScriptSerializer();
@@ -694,7 +685,7 @@ namespace ADSS
                         string strSQL4 = string.Format("select '{2}' as period, type, COUNT(distinct token) as cnt, COUNT(type) as cnt_v from tb_page_visit_info_xango where distributor = '{3}' and convert(date, visit_time) >= '{0}' and convert(date, visit_time) <= '{1}' group by type;", ti.this_month.start, ti.this_month.end, "This month", distributor);
                         string strSQL5 = string.Format("select '{2}' as period, type, COUNT(distinct token) as cnt, COUNT(type) as cnt_v from tb_page_visit_info_xango where distributor = '{3}' and convert(date, visit_time) >= '{0}' and convert(date, visit_time) <= '{1}' group by type;", ti.last_month.start, ti.last_month.end, "Last month", distributor);
 
-                        string strSQL = strSQL1 + strSQL2 + strSQL3 + strSQL4 + strSQL5;
+                        strSQL = strSQL1 + strSQL2 + strSQL3 + strSQL4 + strSQL5;
                         using (SqlConnection sc = new SqlConnection(ConfigurationManager.ConnectionStrings["sqlserver"].ConnectionString))
                         {
                             if (sc != null)
@@ -717,8 +708,7 @@ namespace ADSS
                                         else
                                         {
                                             for (int j = 0; j < ds.Tables[i].Rows.Count; j++)
-                                            {   // yesterday	new	86
-                                                // yesterday	return	124
+                                            {
                                                 DataRow r = ds.Tables[i].Rows[j];
                                                 di.period = Convert.ToString(r[0]);
                                                 if (String.Compare("new", Convert.ToString(r[1]), StringComparison.OrdinalIgnoreCase) == 0)
@@ -744,7 +734,7 @@ namespace ADSS
                 }
                 catch (Exception ex)
                 {
-                    AdssLogger.WriteLog("getDefaultInfo Exception: " + ex.Message);
+                    AdssLogger.WriteLog("getDefaultInfo Exception: " + ex.Message + " --- sql: " + strSQL);
                 }
             }
             return "{}";
@@ -754,7 +744,7 @@ namespace ADSS
         {
             combineBlogDistributor(blog, distributor);
             // select alias, ip, visit_time, type, page, refer, country, province, city from tb_page_visit_info_xango where visit_time >= '2014-06-01' and visit_time <= '2016-06-02' and distributor = 'paul'
-            string strSQL;
+            string strSQL = "";
             try
             {
                 string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, visit_time) >= '{0}'", startDate);
@@ -820,7 +810,7 @@ namespace ADSS
             catch (Exception e)
             {
                 //Trace.WriteLine(e.Message);
-                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getDetailInfo sql excute) --- Exception: " + e.Message);
+                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getDetailInfo sql excute) --- Exception: " + e.Message + " --- sql: " + strSQL);
             }
 
             return "{}";
@@ -977,7 +967,7 @@ namespace ADSS
 
         private string getSingleUser(string alias, string distributor, string startDate, string endDate)
         {
-            string strSQL;
+            string strSQL = "";
             try
             {
                 //string strToken = string.Format("'{0}' order by s.id, s.time", token);
@@ -1044,17 +1034,9 @@ namespace ADSS
             catch (Exception e)
             {
                 //Trace.WriteLine(e.Message);
-                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getDetailInfo sql excute) --- Exception: " + e.Message);
+                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getDetailInfo sql excute) --- Exception: " + e.Message + " --- sql: " + strSQL);
             }
             return "{}";
-        }
-
-        public bool IsReusable
-        {
-            get
-            {
-                return false;
-            }
         }
 
         private string getVisitorTag(string strDistributor, string startDate, string endDate)
@@ -1111,7 +1093,7 @@ namespace ADSS
             catch (Exception e)
             {
                 //Trace.WriteLine(e.Message);
-                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getResult) --- Exception: " + e.Message);
+                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getResult) --- Exception: " + e.Message + " --- sql: " + strSQL);
             }
             return "{}";
         }
@@ -1155,10 +1137,18 @@ namespace ADSS
             catch (Exception e)
             {
                 //Trace.WriteLine(e.Message);
-                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getResult) --- Exception: " + e.Message);
+                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getResult) --- Exception: " + e.Message + " --- sql: " + strSQL);
                 strRet = "Operation failed.";
             }
             return strRet;
+        }
+
+        public bool IsReusable
+        {
+            get
+            {
+                return false;
+            }
         }
     }
 }
