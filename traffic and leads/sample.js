@@ -46,6 +46,10 @@
     if (pageType && pageType.toLowerCase() === 'as') {
         adUrl = getParameterByName('u');
     }
+    var alias;
+    if (pageType && pageType.toLowerCase() === 'si') {
+        alias = getParameterByName('a');
+    }
     //var distributor = getParameterByName('d');
     var distributor = "kectech";
     var distributor;
@@ -53,7 +57,7 @@
         distributor = showname;
     }
 
-    var blogname;
+    var blogname = "healthylife";
     if (typeof blog !== 'undefined') {
         var result = blog.split('/');
         if (result && result.length > 4) {
@@ -102,6 +106,12 @@
                 } else if (pageType.toLowerCase() === 'aqs') {
                     InitAdsQuickStat(distributor, pageType, startDate, endDate, adUrl);
                     $('#as').addClass('type-selected');
+                } else if (pageType.toLowerCase() === 'tfr') {
+                    InitTrafficFromRegion(distributor, pageType, startDate, endDate);
+                    $('#tfr').addClass('type-selected');
+                } else if (pageType.toLowerCase() === 'si') {
+                    InitSingleVisitor(distributor, pageType, startDate, endDate, alias);
+                    $('#dv').addClass('type-selected');
                 } else {
                     // detail visitor
                     $('#dv').addClass('type-selected');
@@ -119,22 +129,27 @@
             $("#navbar > ul").children().each(function () {
                 switch ($(this).index()) {
                     case 0:
-                        //$(this).children().eq(0).attr("href", '?d=' + usr + '&s=' + start + '&e=' + end + '&t=dv');
                         $(this).children().eq(0).attr("href", '?s=' + start + '&e=' + end + '&t=dv');
                         break;
                     case 1:
-                        //$(this).children().eq(0).attr("href", '?d=' + usr + '&s=' + start + '&e=' + end + '&t=tot');
-                        $(this).children().eq(0).attr("href", '?s=' + start + '&e=' + end + '&t=tot');
+                        $(this).children().eq(1).children().each(function () {
+                            switch ($(this).index()) {
+                                case 0:
+                                    $(this).children().eq(0).attr("href", '?s=' + start + '&e=' + end + '&t=tot');
+                                    break;
+                                case 1:
+                                    $(this).children().eq(0).attr("href", '?s=' + start + '&e=' + end + '&t=tfr');
+                                    break;
+                                case 2:
+                                    $(this).children().eq(0).attr("href", '?s=' + start + '&e=' + end + '&t=pv');
+                                    break;
+                                case 3:
+                                    $(this).children().eq(0).attr("href", '?s=' + start + '&e=' + end + '&t=to');
+                                    break;
+                            }
+                        });
                         break;
                     case 2:
-                        //$(this).children().eq(0).attr("href", '?d=' + usr + '&s=' + start + '&e=' + end + '&t=pv');
-                        $(this).children().eq(0).attr("href", '?s=' + start + '&e=' + end + '&t=pv');
-                        break;
-                    case 3:
-                        //$(this).children().eq(0).attr("href", '?d=' + usr + '&s=' + start + '&e=' + end + '&t=to');
-                        $(this).children().eq(0).attr("href", '?s=' + start + '&e=' + end + '&t=to');
-                        break;
-                    case 4:
                         //$(this).children().eq(0).attr("href", '?s=' + start + '&e=' + end + '&t=as');
                         $(this).children().eq(1).children().each(function () {
                             switch ($(this).index()) {
@@ -575,7 +590,9 @@
                             chartData.push(d);
                             rest += entry.count;
                         });
-                        chartData.push(["Others", dataSet.total - rest]);
+
+                        if (dataSet.total > rest)
+                            chartData.push(["Other Pages", dataSet.total - rest]);
 
 
                         function drawPvChart() {
@@ -607,7 +624,8 @@
                                     bottom: "5%",
                                     height: "100%",
                                     width: "100%"
-                                }
+                                },
+                                sliceVisibilityThreshold: 0
                             };
 
                             // Create and populate the data table.
@@ -696,7 +714,7 @@
                             rest += entry.count;
                         });
 
-                        chartData.push(["others", dataSet.total - rest]);
+                        chartData.push(["Other Referres", dataSet.total - rest]);
 
                         function drawToChart() {
                             var pieTitle = "Referrer Chart"
@@ -772,9 +790,12 @@
                 },
 
                 "columns": [
+
                     {
-                        "title": "Distributor", "data": "", render: function (data, type, full, meta) {
-                            return distributor;
+                        "title": "Visitor", "data": "alias", render: function (data, type, full, meta) {
+                            //return data;
+                            //return '<a href="#" class="username" data-type="text" data-pk="1" data-title="Enter an alias name" data-placeholder="Required">' + data + '</a>';
+                            return '<a href="?t=si' + '&s=' + start + '&e=' + end + '&a=' + data + '&d=' + distributor + '">' + data + '</a>';
                         }
                     },
                     {
@@ -812,7 +833,10 @@
                 "initComplete": function (settings, json) {
                     $("#test_wrapper").append(spinner);
                     $("#test").css("width", "100%");
-                }
+                },
+                "sScrollX": "100%",
+                "bScrollCollapse": true,
+
             });
 
             table.order([3, 'desc']).draw();
@@ -865,11 +889,266 @@
                 "initComplete": function (settings, json) {
                     $("#test_wrapper").append(spinner);
                     $("#test").css("width", "100%");
-                }
+                },
+                "sScrollX": "100%",
+                "bScrollCollapse": true,
             });
 
             table.order([3, 'desc']).draw();
         }
+        function InitSingleVisitor(usr, type, start, end, alias) {
+            var edit_option = {
+                validate: function (value) {
+                    if ($.trim(value) == '') {
+                        return 'This field is required';
+                    }
+                }
+            };
+            var saveFn = function (e, params) {
+                var $td = $(e.target).closest('td');
+                var newValue = params.newValue;
+                var oldValue = $td.children('a').html();
+                // send ajax post request, if alias exist, then prompt error.
+
+                $.ajax({
+                    type: "POST",
+                    url: "http://206.190.131.92:6009/SampleAnalytics.ashx",
+                    data: {
+                        update: new Date().getTime(),
+                        t: 'a',
+                        o: oldValue,
+                        n: newValue,
+                        d: distributor
+                    },
+                    success: function (data, status) {
+                        // todo what if failed, when alias already exists.
+                        //console.log(data);
+                    }
+                });
+
+                // change all match cells value
+                table.column(0).nodes().each(function (node, index, dt) {
+                    if (table.cell(node).data() == oldValue) {
+                        table.cell(node).data(newValue);
+                        var cell = table.cell(node).node();
+
+                        $(cell).children('a').editable(edit_option);
+                        $(cell).children('a').one('save', saveFn);
+                    }
+                });
+            };
+
+            $('#reportrange').removeClass('hide-element');
+            var table = $('#test').DataTable({
+                //"processing": true,
+                //"serverSide": true,
+                "autoWidth": true,
+                "destroy": true,
+                "ajax": {
+                    "url": "http://206.190.131.92:6009/SampleAnalytics.ashx?d=" + usr + "&s=" + start + "&e=" + end + "&t=" + type + "&b=" + blogname + "&a=" + alias,
+                    //"type": 'POST',
+                    "dataSrc": ""
+                },
+
+                "columns": [
+                    {
+                        "title": "Visitor", "data": "alias", "render": function (data, type, row, meta) {
+                            return '<a href="#" class="username" data-type="text" data-pk="1" data-title="Enter an alias name" data-placeholder="Required">' + data + '</a>';
+                        }
+                    },
+                    { "title": "Visit Time", "data": "time" },
+                    {
+                        "title": "Status", "data": "type", "createdCell": function (cell, cellData, rowData, rowIndex, colIndex) {
+                            if (cellData) {
+                                if (cellData.toLowerCase() === 'new')
+                                    $(cell).addClass('new-visitor');
+                                else
+                                    $(cell).addClass('return-visitor');
+                            }
+                        }
+                    },
+                    { "title": "Page", "data": "page" },
+                    {
+                        "title": "Location", "data": "country", "render": function (data, type, full, meta) {
+                            var city, province, country;
+                            if (full.city)
+                                city = full.city + ', ';
+                            if (full.province)
+                                province = full.province + ', ';
+                            return city + province + full.country;
+                        }
+                    },
+                    {
+                        "title": "Referrer", "data": "refer", "render": function (data, type, full, meta) {
+                            if (type === "display" || type === 'filter') {
+                                if (!data)
+                                    return 'Direct Access';
+                                else
+                                    return data;
+                            }
+
+                            return data;
+                        }
+                    },
+                    //{
+                    //    "title": "Country", "data": "country", "render": function (data, type, full, meta) {
+                    //        if (type === "display" || type === "filter")
+                    //            if (!data)
+                    //                return "N/A";
+                    //        return data;
+                    //    }
+                    //},
+                    //{
+                    //    "title": "Region", "data": "province", "render": function (data, type, full, meta) {
+                    //        if (type === "display" || type === "filter")
+                    //            if (!data)
+                    //                return "N/A";
+                    //        return data;
+                    //    }
+                    //},
+                    //{
+                    //    "title": "City", "data": "city", "render": function (data, type, full, meta) {
+                    //        if (type === "display" || type === "filter")
+                    //            if (!data)
+                    //                return "N/A";
+                    //        return data;
+                    //    }
+                    //},
+                    { "title": "IP", "data": "ip" }
+                ],
+
+                //"deferRender": true,
+                "ordering": true,
+                "searching": true,
+                "paging": true,
+                "pagingType": "simple_numbers",
+                "info": true,
+                "order": [],
+                //"fixedHeader": true,
+                //"responsive": true,
+                "lengthMenu": [20, 50, 80],
+                "fnDrawCallback": function (oSettings) {
+                    $('.username').editable(edit_option);
+                    $('.username').one('save', saveFn);
+                },
+                "initComplete": function (settings, json) {
+                    $("#test_wrapper").append(spinner);
+                    $("#test").css("width", "100%");
+                },
+                "sScrollX": "100%",
+                "bScrollCollapse": true,
+            });
+
+            table.order([1, 'desc']).draw();
+        }
+        function InitTrafficFromRegion(usr, type, start, end) {
+            $('#reportrange').removeClass('hide-element');
+
+            $.ajax({
+                type: "GET",
+                url: "http://206.190.131.92:6009/SampleAnalytics.ashx?d=" + usr + "&s=" + start + "&e=" + end + "&t=" + type + "&b=" + blogname,
+                success: function (data, status) {
+                    var dataSet = JSON.parse(data);
+                    if (dataSet != null) {
+                        var table = $('#test').DataTable({
+                            "destroy": true,
+                            "data": dataSet.list,
+                            "columns": [
+                                { "title": "City", "data": "page" },
+                                { "title": "Visit", "data": "count" },
+                                { "title": "Percentage", "data": "percentage" }
+                            ],
+                            "ordering": true,
+                            "searching": true,
+                            "paging": false,
+                            //"pagingType": "simple_numbers",
+                            "info": true,
+                            //"order": [],
+                            //"lengthMenu": [10, 30, 50],
+                            "initComplete": function (settings, json) {
+                                $("#test_wrapper").append(spinner);
+                                $("#test").css("width", "100%");
+                            },
+                            "sScrollX": "100%",
+                            "bScrollCollapse": true,
+                        });
+                        table.order([1, 'desc']).draw();
+
+                        var chartData = [];
+                        var rest = 0;
+                        chartData.push(['City', 'Visit']);
+                        dataSet.list.forEach(function (entry) {
+                            var d = [];
+                            d.push(entry.page);
+                            d.push(entry.count);
+                            chartData.push(d);
+                            rest += entry.count;
+                        });
+                        if (dataSet.total > rest)
+                            chartData.push(["Other Region", dataSet.total - rest]);
+
+
+                        function drawPvChart() {
+
+                            var pieTitle = "Traffic Region Chart";
+                            if (dataSet.list.length > 0)
+                                $('#chart-stat').removeClass('hide-element');
+                            else
+                                $('#chart-stat').addClass('hide-element');
+                            var options = {
+                                title: pieTitle,
+                                titlePosition: "out",
+                                width: '100%',
+                                height: '100%',
+                                is3D: true,
+                                //colors: ['#FF6161', '#1AA35F', '#1A87D1', '#C39BD3', '#675874', '#97C774', '#B63E98', '#D18E62', '#8381DA', '#581845', '#0C6B65'],
+                                //colors: ['#C0392B', '#E74C3C', '#9B59B6', '#8E44AD', '#2980B9', '#3498DB', '#1ABC9C', '#16A085', '#27AE60', '#2ECC71', '#34495E', '#2C3E50', '#D35400', '#E67E22'],
+                                colors: [
+                                    '#FF6161', '#1AA35F', '#1A87D1',
+                                    '#9B59B6', '#1ABC9C', '#566573',
+                                    '#D6428A', '#586E36', '#44B2AF',
+                                    '#A2393B', '#2ECC71', '#2C3E50',
+                                ],
+                                //colors: ['#97C774', '#B63E98', '#D18E62', '#DB3E41', '#1BABA5'],8381DA
+                                chartArea: {
+                                    left: "3%",
+                                    top: "5%",
+                                    right: "5%",
+                                    bottom: "5%",
+                                    height: "100%",
+                                    width: "100%"
+                                },
+                                sliceVisibilityThreshold: 0
+                            };
+
+                            // Create and populate the data table.
+                            var data = google.visualization.arrayToDataTable(chartData);
+
+                            // Create and draw the visualization.
+                            new google.visualization.PieChart(document.getElementById('chart-stat')).draw(data, options);
+                            //$("text:contains(" + pieTitle + ")").attr({ 'x': '1' });
+                        };
+
+                        function draw() {
+                            if (!canAccessGoogleVisualization()) {
+                                google.charts.load('current', { 'packages': ['corechart'] });
+                                google.charts.setOnLoadCallback(function () {
+                                    drawPvChart();
+                                });
+                            } else
+                                drawPvChart();
+                        }
+
+                        $(window).resize(function () {
+                            draw();
+                        });
+
+                        draw();
+                    }
+                }
+            });
+        }
+
 
         cb(moment(startDate, "YYYY-MM-DD"), moment(endDate, "YYYY-MM-DD"));
 
@@ -897,7 +1176,7 @@
             if (pageType) {
                 if (pageType.toLowerCase() === 'dv') {
                     // detail visitors
-                    $("#title").html('Detail Visitors');
+                    $("#title").html('Visit Detail');
                     InitDetailVisitors(distributor, pageType, startDate, endDate);
                     $('#dv').addClass('type-selected');
                 }
@@ -905,25 +1184,41 @@
                     // traffic over time
                     $("#title").html('Traffic Over Time');
                     InitTrafficOverTime(distributor, pageType, startDate, endDate);
-                    $('#tot').addClass('type-selected');
+                    //$('#tot').addClass('type-selected');
+                    $('#ts').addClass('type-selected');
                 } else if (pageType.toLowerCase() === 'pv') {
                     // page view
                     $("#title").html('Page Views(Top 10)');
                     InitPageView(distributor, pageType, startDate, endDate);
-                    $('#pv').addClass('type-selected');
+                    //$('#pv').addClass('type-selected');
+                    $('#ts').addClass('type-selected');
                 } else if (pageType.toLowerCase() === 'to') {
                     // traffic origin -- refer
                     $("#title").html('Traffic Origin(Top 5)');
                     InitTrafficOrigin(distributor, pageType, startDate, endDate);
-                    $('#to').addClass('type-selected');
+                    //$('#to').addClass('type-selected');
+                    $('#ts').addClass('type-selected');
                 } else if (pageType.toLowerCase() === 'as') {
                     $("#title").html('Ads Details');
                     InitAdsStat(distributor, pageType, startDate, endDate, adUrl);
                     $('#as').addClass('type-selected');
+                    //$('#acd').addClass('type-selected');
                 } else if (pageType.toLowerCase() === 'aqs') {
                     $("#title").html('Ads Quick Stats');
                     InitAdsQuickStat(distributor, pageType, startDate, endDate, adUrl);
                     $('#as').addClass('type-selected');
+                    //$('#aqs').addClass('type-selected');
+                } else if (pageType.toLowerCase() === 'si') {
+                    // single visitors
+                    $("#title").html('Visit Detail');
+                    InitSingleVisitor(distributor, pageType, startDate, endDate, alias);
+                    $('#dv').addClass('type-selected');
+                } else if (pageType.toLowerCase() === 'tfr') {
+                    // single visitors
+                    $("#title").html('Traffic From Region(Top 10)');
+                    InitTrafficFromRegion(distributor, pageType, startDate, endDate, blogname);
+                    //$('#tfr').addClass('type-selected');
+                    $('#ts').addClass('type-selected');
                 } else {
                     $("#title").html('Quick Stats');
                     InitDefault();

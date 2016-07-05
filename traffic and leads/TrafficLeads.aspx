@@ -64,19 +64,27 @@
                 </div>
                 <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="#" id="dv">Detail Visitors</a></li>
-                        <li><a href="#" id="tot">Traffic Over Time</a></li>
-                        <li><a href="#" id="pv">Page Views</a></li>
-                        <li><a href="#" id="to">Traffic Origin</a></li>
-                        <!--<li><a href="#" id="as">Ads Stat</a></li>-->
+                        <li><a href="#" id="dv">Visit Detail</a></li>
                         <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="as">Ads Stats
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="ts">Traffic Stat
                             <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Quick Stats</a></li>
-                                <li><a href="#">Click Details</a></li>
+                                <li><a href="#" id="tot">Traffic Over Time</a></li>
+                                <li><a href="#" id="tfr">Traffic From Region</a></li>
+                                <li><a href="#" id="pv">Page View</a></li>
+                                <li><a href="#" id="to">Traffic Origin</a></li>
                             </ul>
                         </li>
+                        <!--<li><a href="#" id="as">Ads Stat</a></li>-->
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="as">Ads Stat
+                            <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" id="aqs">Quick Stat</a></li>
+                                <li><a href="#" id="acd">Click Detail</a></li>
+                            </ul>
+                        </li>
+                        <!--<li><a href="#" id="ls">Leads Stat</a></li>-->
                     </ul>
                 </div>
             </div>

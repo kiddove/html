@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!--    <meta charset="utf-8">-->
-<!--    <meta http-equiv="X-UA-Compatible" content="IE=edge">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1">-->
+    <!--    <meta charset="utf-8">-->
+    <!--    <meta http-equiv="X-UA-Compatible" content="IE=edge">-->
+    <!--    <meta name="viewport" content="width=device-width, initial-scale=1">-->
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <!--<link rel="icon" href="../favicon.ico">-->
     <title>Traffic And Leads</title>
@@ -36,7 +36,7 @@
 
     <!--google chart-->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    
+
     <!--base64-->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core-min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64-min.js"></script>
@@ -44,7 +44,7 @@
     <script src="sample.js"></script>
     <link rel="stylesheet" type="text/css" href="sample.css">
 
-<!--    <script src="fingerprint2.js"></script>
+    <!--    <script src="fingerprint2.js"></script>
     <script src="stat.js"></script>-->
 
 </head>
@@ -63,19 +63,27 @@
                 </div>
                 <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="#" id="dv">Detail Visitors</a></li>
-                        <li><a href="#" id="tot">Traffic Over Time</a></li>
-                        <li><a href="#" id="pv">Page Views</a></li>
-                        <li><a href="#" id="to">Traffic Origin</a></li>
+                        <li><a href="#" id="dv">Visit Detail</a></li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="ts">Traffic Stat
+                            <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" id="tot">Traffic Over Time</a></li>
+                                <li><a href="#" id="tfr">Traffic From Region</a></li>
+                                <li><a href="#" id="pv">Page View</a></li>
+                                <li><a href="#" id="to">Traffic Origin</a></li>
+                            </ul>
+                        </li>
                         <!--<li><a href="#" id="as">Ads Stat</a></li>-->
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="as">Ads Stat
                             <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Quick Stat</a></li>
-                                <li><a href="#">Click Detail</a></li>
+                                <li><a href="#" id="aqs">Quick Stat</a></li>
+                                <li><a href="#" id="acd">Click Detail</a></li>
                             </ul>
                         </li>
+                        <!--<li><a href="#" id="ls">Leads Stat</a></li>-->
                     </ul>
                 </div>
             </div>

@@ -30,7 +30,9 @@
         var ua = detect.parse(navigator.userAgent);
         var fp = new Fingerprint2();
         var distributor = getParameterByName("id");
+        var token;
         fp.get(function (result) {
+            token = result;
             var uploadObj = {};
             // ip, token, agent, language, color_depth, screen_resolution, time_zone, platform, device, os, visit_time(*), country, province, city, province_code, alias(*), distributor, refer, page, type(*)
             // asp.net
@@ -71,20 +73,21 @@
 
         if ($('#dlLImgList img').length > 0) {
             $('#dlLImgList img').click(function () {
-                sendAdStat($(this)[0].src, distributor);
+                sendAdStat($(this)[0].src, distributor, token);
             });
         }
         if ($('#dlRImgList img').length > 0) {
             $('#dlRImgList img').click(function () {
-                sendAdStat($(this)[0].src, distributor);
+                sendAdStat($(this)[0].src, distributor, token);
             });
         }
 
-        function sendAdStat(src, distributor) {
+        function sendAdStat(src, distributor, token) {
             var obj = {};
             obj.url = src;
             obj.distributor = distributor;
             obj.page = window.location.pathname;
+            obj.token = token;
             var params = JSON.stringify(obj);
             if (distributor) {
                 $.ajax({

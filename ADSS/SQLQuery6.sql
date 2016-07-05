@@ -82,12 +82,17 @@ select * from tb_page_visit_info_xango
 --update tb_page_visit_info_xango set alias = (select alias from tb_page_visit_info_xango where )
 
 
-select * from tb_distributor_blog
+select * from tb_blog_to_distributor
 
-insert into tb_distributor_blog (token,uniq, alias )
-select token, uniq, token from tb_page_visit_info_xango group by token, uniq
-
-
+--declare @i_token varchar(64)
+--declare @i_ip varchar(64)
+--declare @i_visit_time datetime 
+--select top 1 @i_token = token, @i_ip=ip , @i_visit_time = visit_time from tb_page_visit_info_xango where distributor = 'kectech' order by visit_time desc
+--if DATEDIFF(minute, getdate(), @i_visit_time) > 10
+--print 'yes';
+--else
+--print 'no';
+--print DATEDIFF(minute, getdate(), @i_visit_time)
 
 select b.alias, a.ip, a.visit_time, a.type, a.page, a.refer, a.country, a.province, a.city, a.province_code from tb_page_visit_info_xango as a , tb_distributor_blog as b 
 where a.uniq = b.uniq and a.uniq='kectech'
@@ -96,6 +101,11 @@ insert into tb_blog_to_distributor values ('healthylife', 'kectech');
 
 --truncate table tb_blog_to_distributor
 select * from tb_blog_to_distributor
+
+
+select distributor, token, alias, type,COUNT(*) from tb_page_visit_info_xango 
+where distributor = 'brendacook'
+group by distributor, token, alias, type
 
 
 select top 20 token, alias, visit_time, distributor, page from tb_page_visit_info_xango order by visit_time desc

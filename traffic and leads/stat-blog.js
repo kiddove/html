@@ -33,9 +33,10 @@
         if (result && result.length > 2) {
             distributor = result[2];
         }
-        
+        var token;
         var fp = new Fingerprint2();
         fp.get(function (result) {
+            token = result;
             var uploadObj = {};
             // ip, token, agent, language, color_depth, screen_resolution, time_zone, platform, device, os, visit_time(*), country, province, city, province_code, alias(*), distributor, refer, page, type(*)
             // asp.net
@@ -74,20 +75,21 @@
 
         if ($('banner img').length > 0) {
             $('banner img').click(function () {
-                sendAdStat($(this)[0].src, distributor);
+                sendAdStat($(this)[0].src, distributor, token);
             });
         }
 
         if ($('.mh-widget.widget_sasweb-full-banner-widget img').length > 0) {
             $('.mh-widget.widget_sasweb-full-banner-widget img').click(function () {
-                sendAdStat($(this)[0].src, distributor);
+                sendAdStat($(this)[0].src, distributor, token);
             });
         }
-        function sendAdStat(src, distributor) {
+        function sendAdStat(src, distributor, token) {
             var obj = {};
             obj.url = src;
             obj.blog = distributor;
             obj.page = window.location.pathname;
+            obj.token = token;
             var params = JSON.stringify(obj);
             if (distributor) {
                 $.ajax({

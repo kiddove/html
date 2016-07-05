@@ -148,7 +148,7 @@ select ROUND(1 /cast((select COUNT(*) from tb_page_visit_info_xango) as decimal(
 select page, COUNT(*) as count, COUNT(*) * 100.0 / SUM(COUNT(*)) over() as percentage from tb_page_visit_info_xango group by page order by percentage desc
 
 
-select top 5 page, COUNT(*) as count, COUNT(*) / SUM(COUNT(*)) over() as percentage from tb_page_visit_info_xango where distributor='paul' and visit_time >= '2016-05-05' and visit_time <= '2016-06-03' group by page order by percentage desc
+select top 5 refer, COUNT(*) as visit, COUNT(*) * 1.0/ SUM(COUNT(*)) over() as percentage, SUM(COUNT(*)) over() as total from tb_page_visit_info_xango where distributor='kectech' and visit_time >= '2016-05-05' and visit_time <= '2016-07-03' group by refer order by percentage desc
 
 select LEN('/xango/healthyone/blog/chapter-1-introduction-man-thought-way-partnership-thomas-edison-chapter-2-desire-starting-point-achievement-first-step-toward-riches/')
 
@@ -167,3 +167,94 @@ select count(*) from (select distinct token ,type, CAST(visit_time as DATE) from
 
 select token, type from tb_page_visit_info_xango where CAST(visit_time as DATE) = '2016-06-21' and distributor = 'kectech' group by token, type
 select 'yesterday' as period, type, COUNT(distinct token) as c, COUNT(type) as v from tb_page_visit_info_xango where distributor = 'kectech' and convert(date, visit_time) >= '2016-06-22' and convert(date, visit_time) <= '2016-06-22' group by type;
+
+
+
+select top 5 refer, COUNT(*) as visit, COUNT(*) * 1.0/ SUM(COUNT(*)) over() as percentage, SUM(COUNT(*)) over() as total from tb_page_visit_info_xango where distributor='kectech' and convert(date, visit_time) >= '2016-05-24' and convert(date, visit_time) <= '2016-06-22' group by refer order by percentage desc
+
+
+
+select * from tb_page_visit_info_xango where refer = 'http://206.190.141.88/businessshowroom.aspx?id=xango' order by visit_time desc
+
+select * from tb_page_ads_click_stat order by click_time desc
+
+select * from tb_page_visit_info_xango order by visit_time desc
+
+select * from tb_page_visit_info_xango where distributor = 'healthylife' and type = 'new'
+order by visit_time desc
+
+update tb_page_visit_info_xango set distributor='brendacook' where distributor = '6022931'
+
+select * from tb_blog_to_distributor
+
+select * from tb_page_ads_click_stat
+
+
+select a.url, a.page, a.click_time, b.alias from tb_page_visit_info_xango as b, tb_page_ads_click_stat as a where a.distributor = 'kectech'
+and a.distributor = b.distributor and a.token = b.token group by a.url, a.page, a.click_time, b.alias
+order by a.click_time desc
+
+
+select top 10 city, COUNT(*) as visit, COUNT(*) * 1.0 / SUM(COUNT(*)) over() as percentage, SUM(COUNT(*)) over() as total, province, country from tb_page_visit_info_xango where distributor='kectech' group by city, province, country order by percentage desc
+
+select distinct alias from tb_page_visit_info_xango where distributor = 'kectech' and token = '0da1db8411f25bb2ff8b2cbeccd24283'
+
+
+select top 1 * from tb_page_visit_info_xango where distributor = 'kectech' order by id desc 
+
+--insert into tb_page_visit_info_xango (token, ip, agent, language, color_depth, screen_resolution, time_zone, platform, device, os, country, province, city, province_code, refer, page, distributor) values ('0da1db8411f25bb2ff8b2cbeccd24283', '174.117.34.102', 'Chrome 51', 'en-US', 24, '1080x1920', 240, 'Win32', 'Desktop', 'Windows 7', 'Canada', 'Ontario', 'Toronto', 'ON', 'http://206.190.141.88/TrafficLeads.aspx?s=2016-05-31&e=2016-06-29&t=dv', '/BusinessShowRoom.aspx', 'kectech')
+
+declare @s varchar (1024) = null
+declare @s2 varchar (1024) = null
+select @s2 = null
+select @s = '12341'
+if ( (@s is null and @s2 is not null) or (@s is not null and @s2 is null) or (@s<> @s2))
+print @s
+
+--insert into tb_page_visit_info_xango (token, ip, agent, language, color_depth, screen_resolution, time_zone, platform, device, os, country, province, city, province_code, refer, page, distributor) values ('0da1db8411f25bb2ff8b2cbeccd24283', '174.117.34.102', 'Chrome 51', 'en-US', 24, '1080x1920', 240, 'Win32', 'Desktop', 'Windows 7', 'Canada', 'Ontario', 'Toronto', 'ON', 'http://206.190.141.88/TrafficLeads.aspx?s=2016-05-31&e=2016-06-29&t=dv', '/xango/healthylife/', 'kectech')
+
+
+select url, count(*) as c from tb_page_ads_click_stat where distributor='kectech' and convert(date, click_time) >= '2016-05-31' and convert(date, click_time) <= '2016-06-29' group by distributor, url order by c desc
+
+
+
+select * from tb_page_visit_info_xango where video is not null
+select * from tb_blog_to_distributor
+
+select * from tb_page_visit_info_xango where token='bd3533ae57d0109b8ad4de5ad10dc874' and distributor = 'kectech'
+
+--update tb_page_visit_info_xango set type = 'return' where token = 'bd3533ae57d0109b8ad4de5ad10dc874' and id <> 611
+
+print DATEDIFF(minute, null, getdate())
+
+select id, type from tb_page_visit_info_xango where token='bd3533ae57d0109b8ad4de5ad10dc874' and distributor = 'brendacook'
+
+--update tb_page_visit_info_xango set type = 'new' where id = 873
+
+
+select * from tb_page_ads_click_stat
+
+select distributor, token, alias, type,COUNT(*) from tb_page_visit_info_xango 
+where distributor = 'kectech' and type='new'
+group by distributor, token, alias, type 
+having COUNT(*) > 1
+
+--ae5f55e6b88f6b7ec7195fb4d9e304c0
+--ae5f55e6b88f6b7ec7195fb4d9e304c0
+--update tb_page_visit_info_xango set alias = 'Google Crawler' where token = 'ae5f55e6b88f6b7ec7195fb4d9e304c0' and distributor = 'kectech' and alias = 'ae5f55e6b88f6b7ec7195fb4d9e304c0'
+
+
+select * from tb_page_visit_info_xango where token = '204650cf75d94725cc66a6693c72fd6e' and distributor = 'brendacook' and type='new'
+
+update tb_page_visit_info_xango set type='new' 
+where id = (select top 1 id from tb_page_visit_info_xango where token = 'bd3533ae57d0109b8ad4de5ad10dc874' and distributor = 'xango' )
+
+update tb_page_visit_info_xango set type='return' , alias='204650cf75d94725cc66a6693c72fd6e' --where id = 5117
+where token = '204650cf75d94725cc66a6693c72fd6e' and distributor = 'brendacook' and alias is null
+
+select distinct distributor from tb_page_visit_info_xango
+
+
+select COUNT(*) from tb_page_visit_info_xango where distributor = 'paul'
+
+select * from tb_page_visit_info_xango where alias is null
