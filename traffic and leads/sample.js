@@ -40,7 +40,7 @@
             return true;
         }
     }
-
+    var table;
     var pageType = getParameterByName('t');
     var adUrl;
     if (pageType && pageType.toLowerCase() === 'as') {
@@ -50,14 +50,17 @@
     if (pageType && pageType.toLowerCase() === 'si') {
         alias = getParameterByName('a');
     }
-    //var distributor = getParameterByName('d');
+
     var distributor = "kectech";
-    var distributor;
+    //var distributor = "brendacook";
+    //var distributor;
     if (typeof showname !== 'undefined') {
         distributor = showname;
     }
 
     var blogname = "healthylife";
+    //var blogname = "brendacook";
+    //var blogname;
     if (typeof blog !== 'undefined') {
         var result = blog.split('/');
         if (result && result.length > 4) {
@@ -69,6 +72,9 @@
     startDate = getParameterByName('s');
     var endDate;
     endDate = getParameterByName('e');
+
+    var ad_click_time;
+    ad_click_time = getParameterByName('ac');
 
     var spinner = '<div id="spinner" class="spinner hide-element" ><img id="img-spinner" src="./js/stat/ajax-loader.gif" alt="Loading" /></div>';
 
@@ -110,7 +116,7 @@
                     InitTrafficFromRegion(distributor, pageType, startDate, endDate);
                     $('#tfr').addClass('type-selected');
                 } else if (pageType.toLowerCase() === 'si') {
-                    InitSingleVisitor(distributor, pageType, startDate, endDate, alias);
+                    InitSingleVisitor(distributor, pageType, startDate, endDate, alias, ad_click_time);
                     $('#dv').addClass('type-selected');
                 } else {
                     // detail visitor
@@ -168,6 +174,18 @@
                 }
             });
         }
+
+        function HilightRow() {
+            $('#test tbody').on('click', 'tr', function () {
+                if ($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                }
+                else {
+                    table.$('tr.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                }
+            });
+        }
         function InitDefault() {
             // default
             var time_period = {
@@ -178,7 +196,7 @@
                 'Last_Month': { start: moment().subtract(1, 'month').startOf('month').format('YYYY-MM-DD'), end: moment().subtract(1, 'month').endOf('month').format('YYYY-MM-DD') }
             };
 
-            var table = $('#test').DataTable({
+            table = $('#test').DataTable({
                 //"processing": true,
                 //"serverSide": true,
                 "destroy": true,
@@ -205,7 +223,7 @@
                     },
                     {
                         "title": "Total PageView", "data": "visit", "render": function (data, type, full, meta) {
-                            return data.r + data.n;
+                            return data;
                         }
                     }
                 ],
@@ -230,54 +248,91 @@
                 //},
                 "initComplete": function (settings, json) {
                     $("#test_wrapper").append(spinner);
-                    $("#test").css("width", "100%");
+                    HilightRow();
+                    //$(window).trigger('resize');
                 }
             });
         }
         function InitDetailVisitors(usr, type, start, end) {
+
             var edit_option = {
                 validate: function (value) {
                     if ($.trim(value) == '') {
                         return 'This field is required';
+                    } else if (value.indexOf('#') > -1) {
+                        return 'Cannot contain special charactors';
+                    }
+                },
+                url: "http://206.190.131.92:6009/SampleAnalytics.ashx",
+                send: "always",
+                params: function (params) {
+                    //The params already have the default pk, name and value.
+                    var data = {};
+                    data['t'] = 'a';
+                    data['n'] = params.value;
+                    data['o'] = $(this).text();
+                    data['d'] = usr;
+                    data['update'] = new Date().getTime();
+                    return data;
+                },
+                success: function (response, newValue) {
+                    // data.success
+                    // data.message
+                    // data.key
+                    var dataObj = JSON.parse(response);
+                    if (dataObj.success != 1) {
+                        bootbox.dialog({
+                            message: dataObj.message,
+                            //title: "Custom title",
+                            //buttons: {
+                            //    success: {
+                            //        label: "Success!",
+                            //        className: "btn-success",
+                            //        callback: function () {
+                            //            Example.show("great success");
+                            //        }
+                            //    },
+                            //    danger: {
+                            //        label: "Danger!",
+                            //        className: "btn-danger",
+                            //        callback: function () {
+                            //            Example.show("uh oh, look out!");
+                            //        }
+                            //    },
+                            //    main: {
+                            //        label: "Click ME!",
+                            //        className: "btn-primary",
+                            //        callback: function () {
+                            //            Example.show("Primary button");
+                            //        }
+                            //    }
+                            //}
+                        });
+                        return { newValue: dataObj.key };
+                    }
+                    else {
+                        // change all match cells value
+                        table.column(0).nodes().each(function (node, index, dt) {
+                            if (table.cell(node).data() == dataObj.key) {
+                                table.cell(node).data(newValue);
+                                var cell = table.cell(node).node();
+
+                                $(cell).children('a').editable(edit_option);
+                                //$(cell).children('a').one('save', saveFn);
+                            }
+                        });
+                    }
+                },
+                error: function (response, newValue) {
+                    if (response.status === 500) {
+                        return 'Service unavailable. Please try later.';
+                    } else {
+                        return response.responseText;
                     }
                 }
             };
-            var saveFn = function (e, params) {
-                var $td = $(e.target).closest('td');
-                var newValue = params.newValue;
-                var oldValue = $td.children('a').html();
-                // send ajax post request, if alias exist, then prompt error.
-
-                $.ajax({
-                    type: "POST",
-                    url: "http://206.190.131.92:6009/SampleAnalytics.ashx",
-                    data: {
-                        update: new Date().getTime(),
-                        t: 'a',
-                        o: oldValue,
-                        n: newValue,
-                        d: distributor
-                    },
-                    success: function (data, status) {
-                        // todo what if failed, when alias already exists.
-                        //console.log(data);
-                    }
-                });
-
-                // change all match cells value
-                table.column(0).nodes().each(function (node, index, dt) {
-                    if (table.cell(node).data() == oldValue) {
-                        table.cell(node).data(newValue);
-                        var cell = table.cell(node).node();
-
-                        $(cell).children('a').editable(edit_option);
-                        $(cell).children('a').one('save', saveFn);
-                    }
-                });
-            };
-
             $('#reportrange').removeClass('hide-element');
-            var table = $('#test').DataTable({
+            table = $('#test').DataTable({
                 //"processing": true,
                 //"serverSide": true,
                 "autoWidth": true,
@@ -305,24 +360,51 @@
                             }
                         }
                     },
-                    { "title": "Page", "data": "page" },
+                    { "title": "Page", "data": "page", "render": $.fn.dataTable.render.ellipsis(30) },
                     {
-                        "title": "Location", "data": "country", "render": function (data, type, full, meta) {
-                            var city, province, country;
+                        "title": "Video", "data": "video", "width": "6em", "render": function (data, type, full, meta) {
+                            if (!data)
+                                return "N/A";
+                            else
+                                return '<img class="img-thumbnail" src="' + data + '" alt="banner">';
+                        }
+                    },
+                    {
+                        "title": "Location", "data": "", "render": function (data, type, full, meta) {
+                            var city = province = country = "";
                             if (full.city)
                                 city = full.city + ', ';
                             if (full.province)
                                 province = full.province + ', ';
-                            return city + province + full.country;
+                            //return city + province + full.country;
+
+                            if (type === "display") {
+                                return $.fn.dataTable.render.ellipsis(30)(city + province + full.country, type, full);
+                            } else
+                                return city + province + full.country;
                         }
                     },
                     {
                         "title": "Referrer", "data": "refer", "render": function (data, type, full, meta) {
-                            if (type === "display" || type === 'filter') {
+                            //if (type === "display" || type === 'filter') {
+                            //    if (!data)
+                            //        return 'Direct Access';
+                            //    else
+                            //        return data;
+                            //}
+
+                            //return data;
+
+                            if (type === "filter") {
                                 if (!data)
                                     return 'Direct Access';
                                 else
                                     return data;
+                            } else if (type === "display") {
+                                if (!data)
+                                    return 'Direct Access';
+                                else
+                                    return $.fn.dataTable.render.ellipsis(50)(data, type, full);
                             }
 
                             return data;
@@ -352,7 +434,8 @@
                     //        return data;
                     //    }
                     //},
-                    { "title": "IP", "data": "ip" }
+                    { "title": "IP", "data": "ip" },
+
                 ],
 
                 //"deferRender": true,
@@ -367,14 +450,34 @@
                 "lengthMenu": [20, 50, 80],
                 "fnDrawCallback": function (oSettings) {
                     $('.username').editable(edit_option);
-                    $('.username').one('save', saveFn);
+                    //$('.username').one('save', saveFn);
                 },
                 "initComplete": function (settings, json) {
                     $("#test_wrapper").append(spinner);
-                    $("#test").css("width", "100%");
+                    HilightRow();
+                    //table.columns.adjust().draw();
                 },
-                "sScrollX": "100%",
+                //"sScrollX": "100%",
                 "bScrollCollapse": true,
+                scrollX: true,
+                //"autoWidth": false,
+                //"columnDefs": [
+                //    {
+                //        "targets": [5, 6],
+                //        render: $.fn.dataTable.render.ellipsis(30)
+                //    }
+                //]
+                //if editable can not be fixed
+                //fixedColumns: {
+                //    leftColumns:1
+                //}
+
+                //"createdRow": function (row, data, index) {
+                //    if (data.video) {
+                //        //$('td', row).parent().eq(0).addClass('selected');
+                //        $(row).eq(0).addClass('highlighted');
+                //    }
+                //}
             });
 
             table.order([1, 'desc']).draw();
@@ -389,7 +492,7 @@
                     // todo what if failed, when alias already exists.
                     var dataSet = JSON.parse(data);
                     if (dataSet != null) {
-                        var table = $('#test').DataTable({
+                        table = $('#test').DataTable({
                             //"processing": true,
                             //"serverSide": true,
                             "destroy": true,
@@ -427,7 +530,7 @@
                                 },
                                 {
                                     "title": "Total PageView", "data": "visit", "render": function (data, type, full, meta) {
-                                        return data.r + data.n;
+                                        return data;
                                     }
                                 }
                             ],
@@ -452,12 +555,13 @@
                             //},
                             "initComplete": function (settings, json) {
                                 $("#test_wrapper").append(spinner);
-                                $("#test").css("width", "100%");
+                                HilightRow();
+                                //$(window).trigger('resize');
                             },
                             "sScrollX": "100%",
                             "bScrollCollapse": true,
                         });
-                        table.order([1, 'asc']).draw();
+                        table.order([1, 'desc']).draw();
 
                         var chartData = [];
                         var style_normal = 'opacity: 1.0';
@@ -556,11 +660,11 @@
                 success: function (data, status) {
                     var dataSet = JSON.parse(data);
                     if (dataSet != null) {
-                        var table = $('#test').DataTable({
+                        table = $('#test').DataTable({
                             "destroy": true,
                             "data": dataSet.list,
                             "columns": [
-                                { "title": "Page", "data": "page" },
+                                { "title": "Page", "data": "page", "render": $.fn.dataTable.render.ellipsis(90) },
                                 { "title": "Visit", "data": "count" },
                                 { "title": "Percentage", "data": "percentage" }
                             ],
@@ -573,7 +677,8 @@
                             //"lengthMenu": [10, 30, 50],
                             "initComplete": function (settings, json) {
                                 $("#test_wrapper").append(spinner);
-                                $("#test").css("width", "100%");
+                                HilightRow();
+                                //$(window).trigger('resize');
                             },
                             "sScrollX": "100%",
                             "bScrollCollapse": true,
@@ -664,17 +769,30 @@
                 success: function (data, status) {
                     var dataSet = JSON.parse(data);
                     if (dataSet != null) {
-                        var table = $('#test').DataTable({
+                        table = $('#test').DataTable({
                             "destroy": true,
                             "data": dataSet.list,
                             "columns": [
                                {
                                    "title": "Referrer", "data": "page", "render": function (data, type, full, meta) {
-                                       if (type === "display" || type === 'filter') {
+                                       //if (type === "display" || type === 'filter') {
+                                       //    if (!data)
+                                       //        return 'Direct Access';
+                                       //    else
+                                       //        return data;
+                                       //}
+
+                                       //return data;
+                                       if (type === "filter") {
                                            if (!data)
                                                return 'Direct Access';
                                            else
                                                return data;
+                                       } else if (type === "display") {
+                                           if (!data)
+                                               return 'Direct Access';
+                                           else
+                                               return $.fn.dataTable.render.ellipsis(90)(data, type, full);
                                        }
 
                                        return data;
@@ -692,7 +810,8 @@
                             //"lengthMenu": [10, 30, 50],
                             "initComplete": function (settings, json) {
                                 $("#test_wrapper").append(spinner);
-                                $("#test").css("width", "100%");
+                                HilightRow();
+                                //$(window).trigger('resize');
                             },
                             "sScrollX": "100%",
                             "bScrollCollapse": true,
@@ -779,7 +898,7 @@
             if (url) {
                 con = "&u=" + url;
             }
-            var table = $('#test').DataTable({
+            table = $('#test').DataTable({
                 //"processing": true,
                 //"serverSide": true,
                 "destroy": true,
@@ -809,7 +928,7 @@
                             //return '<a href="' + data + '" target="_blank"><img src="' + data + '" alt="banner"></a>';
                         }
                     },
-                    { "title": "Page", "data": "page" },
+                    { "title": "Page", "data": "page", "render": $.fn.dataTable.render.ellipsis(75) },
                     {
                         "title": "Time", "data": "time", "render": function (data, type, full, meta) {
                             if (type === "display" || type === "filter")
@@ -832,11 +951,11 @@
                 "lengthMenu": [20, 50, 80],
                 "initComplete": function (settings, json) {
                     $("#test_wrapper").append(spinner);
-                    $("#test").css("width", "100%");
+                    HilightRow();
+                    //$(window).trigger('resize');
                 },
                 "sScrollX": "100%",
                 "bScrollCollapse": true,
-
             });
 
             table.order([3, 'desc']).draw();
@@ -847,7 +966,7 @@
             if (url) {
                 con = "&u=" + url;
             }
-            var table = $('#test').DataTable({
+            table = $('#test').DataTable({
                 //"processing": true,
                 //"serverSide": true,
                 "destroy": true,
@@ -872,7 +991,7 @@
                             //return '<img src="' + data + '" alt="banner">';
                         }
                     },
-                    { "title": "Page", "data": "page" },
+                    //{ "title": "Page", "data": "page" },
                     { "title": "Count", "data": "count" }
                 ],
 
@@ -888,58 +1007,129 @@
                 "lengthMenu": [20, 50, 80],
                 "initComplete": function (settings, json) {
                     $("#test_wrapper").append(spinner);
-                    $("#test").css("width", "100%");
+                    HilightRow();
+                    //$(window).trigger('resize');
                 },
-                "sScrollX": "100%",
+                //"sScrollX": "100%",
+                scrollX: true,
                 "bScrollCollapse": true,
             });
 
-            table.order([3, 'desc']).draw();
+            table.order([2, 'desc']).draw();
         }
-        function InitSingleVisitor(usr, type, start, end, alias) {
+        function InitSingleVisitor(usr, type, start, end, alias, time) {
             var edit_option = {
                 validate: function (value) {
                     if ($.trim(value) == '') {
                         return 'This field is required';
+                    } else if (value.indexOf('#') > -1) {
+                        return 'Cannot contain special charactors';
+                    }
+                },
+                url: "http://206.190.131.92:6009/SampleAnalytics.ashx",
+                send: "always",
+                params: function (params) {
+                    //The params already have the default pk, name and value.
+                    var data = {};
+                    data['t'] = 'a';
+                    data['n'] = params.value;
+                    data['o'] = $(this).text();
+                    data['d'] = usr;
+                    data['update'] = new Date().getTime();
+                    return data;
+                },
+                success: function (response, newValue) {
+                    // data.success
+                    // data.message
+                    // data.key
+                    var dataObj = JSON.parse(response);
+                    if (dataObj.success != 1) {
+                        bootbox.dialog({
+                            message: "I am a custom dialog",
+                            title: "Custom title",
+                            buttons: {
+                                success: {
+                                    label: "Success!",
+                                    className: "btn-success",
+                                    callback: function () {
+                                        Example.show("great success");
+                                    }
+                                },
+                                danger: {
+                                    label: "Danger!",
+                                    className: "btn-danger",
+                                    callback: function () {
+                                        Example.show("uh oh, look out!");
+                                    }
+                                },
+                                main: {
+                                    label: "Click ME!",
+                                    className: "btn-primary",
+                                    callback: function () {
+                                        Example.show("Primary button");
+                                    }
+                                }
+                            }
+                        });
+                        return { newValue: dataObj.key };
+                    }
+                    else {
+                        // change all match cells value
+                        table.column(0).nodes().each(function (node, index, dt) {
+                            if (table.cell(node).data() == dataObj.key) {
+                                table.cell(node).data(newValue);
+                                var cell = table.cell(node).node();
+
+                                $(cell).children('a').editable(edit_option);
+                                //$(cell).children('a').one('save', saveFn);
+                            }
+                        });
+                    }
+                },
+                error: function (response, newValue) {
+                    if (response.status === 500) {
+                        return 'Service unavailable. Please try later.';
+                    } else {
+                        return response.responseText;
                     }
                 }
             };
-            var saveFn = function (e, params) {
-                var $td = $(e.target).closest('td');
-                var newValue = params.newValue;
-                var oldValue = $td.children('a').html();
-                // send ajax post request, if alias exist, then prompt error.
+            //var saveFn = function (e, params) {
+            //    var $td = $(e.target).closest('td');
+            //    var newValue = params.newValue;
+            //    var oldValue = $td.children('a').html();
+            //    // send ajax post request, if alias exist, then prompt error.
 
-                $.ajax({
-                    type: "POST",
-                    url: "http://206.190.131.92:6009/SampleAnalytics.ashx",
-                    data: {
-                        update: new Date().getTime(),
-                        t: 'a',
-                        o: oldValue,
-                        n: newValue,
-                        d: distributor
-                    },
-                    success: function (data, status) {
-                        // todo what if failed, when alias already exists.
-                        //console.log(data);
-                    }
-                });
+            //    $.ajax({
+            //        type: "POST",
+            //        url: "http://206.190.131.92:6009/SampleAnalytics.ashx",
+            //        data: {
+            //            update: new Date().getTime(),
+            //            t: 'a',
+            //            o: oldValue,
+            //            n: newValue,
+            //            d: distributor
+            //        },
+            //        success: function (data, status) {
+            //            // todo what if failed, when alias already exists.
+            //            //console.log(data);
+            //        }
+            //    });
 
-                // change all match cells value
-                table.column(0).nodes().each(function (node, index, dt) {
-                    if (table.cell(node).data() == oldValue) {
-                        table.cell(node).data(newValue);
-                        var cell = table.cell(node).node();
+            //    // change all match cells value
+            //    table.column(0).nodes().each(function (node, index, dt) {
+            //        if (table.cell(node).data() == oldValue) {
+            //            table.cell(node).data(newValue);
+            //            var cell = table.cell(node).node();
 
-                        $(cell).children('a').editable(edit_option);
-                        $(cell).children('a').one('save', saveFn);
-                    }
-                });
-            };
+            //            $(cell).children('a').editable(edit_option);
+            //            $(cell).children('a').one('save', saveFn);
+            //        }
+            //    });
+            //};
 
             $('#reportrange').removeClass('hide-element');
-            var table = $('#test').DataTable({
+            table = $('#test').DataTable({
                 //"processing": true,
                 //"serverSide": true,
                 "autoWidth": true,
@@ -967,24 +1157,49 @@
                             }
                         }
                     },
-                    { "title": "Page", "data": "page" },
+                    { "title": "Page", "data": "page", "render": $.fn.dataTable.render.ellipsis(30) },
                     {
-                        "title": "Location", "data": "country", "render": function (data, type, full, meta) {
-                            var city, province, country;
+                        "title": "Video", "data": "video", "width": "6em", "render": function (data, type, full, meta) {
+                            if (!data)
+                                return "N/A";
+                            else
+                                return '<img class="img-thumbnail" src="' + data + '" alt="banner">';
+                        }
+                    },
+                    {
+                        "title": "Location", "data": "", "render": function (data, type, full, meta) {
+                            var city = province = country = "";
                             if (full.city)
                                 city = full.city + ', ';
                             if (full.province)
                                 province = full.province + ', ';
-                            return city + province + full.country;
+                            //return city + province + full.country;
+                            if (type === "display") {
+                                return $.fn.dataTable.render.ellipsis(30)(city + province + full.country, type, full);
+                            } else
+                                return city + province + full.country;
                         }
                     },
                     {
                         "title": "Referrer", "data": "refer", "render": function (data, type, full, meta) {
-                            if (type === "display" || type === 'filter') {
+                            //if (type === "display" || type === 'filter') {
+                            //    if (!data)
+                            //        return 'Direct Access';
+                            //    else
+                            //        return data;
+                            //}
+
+                            //return data;
+                            if (type === "filter") {
                                 if (!data)
                                     return 'Direct Access';
                                 else
                                     return data;
+                            } else if (type === "display") {
+                                if (!data)
+                                    return 'Direct Access';
+                                else
+                                    return $.fn.dataTable.render.ellipsis(50)(data, type, full);
                             }
 
                             return data;
@@ -1029,14 +1244,23 @@
                 "lengthMenu": [20, 50, 80],
                 "fnDrawCallback": function (oSettings) {
                     $('.username').editable(edit_option);
-                    $('.username').one('save', saveFn);
+                    //$('.username').one('save', saveFn);
                 },
                 "initComplete": function (settings, json) {
                     $("#test_wrapper").append(spinner);
-                    $("#test").css("width", "100%");
+                    HilightRow();
+                    //$(window).trigger('resize');
                 },
-                "sScrollX": "100%",
+                //"sScrollX": "100%",
+                scrollX: true,
                 "bScrollCollapse": true,
+                autoWidth: false,
+                //"createdRow": function (row, data, index) {
+                //    if (data.video) {
+                //        //$('td', row).parent().eq(0).addClass('selected');
+                //        $(row).eq(0).addClass('highlighted');
+                //    }
+                //}
             });
 
             table.order([1, 'desc']).draw();
@@ -1050,11 +1274,20 @@
                 success: function (data, status) {
                     var dataSet = JSON.parse(data);
                     if (dataSet != null) {
-                        var table = $('#test').DataTable({
+                        table = $('#test').DataTable({
                             "destroy": true,
                             "data": dataSet.list,
                             "columns": [
-                                { "title": "City", "data": "page" },
+                                {
+                                    "title": "Region", "data": "", "render": function (data, type, full, meta) {
+                                        var city, province, country;
+                                        if (full.page)
+                                            city = full.page + ', ';
+                                        if (full.province)
+                                            province = full.province + ', ';
+                                        return city + province + full.country;
+                                    }
+                                },
                                 { "title": "Visit", "data": "count" },
                                 { "title": "Percentage", "data": "percentage" }
                             ],
@@ -1067,7 +1300,8 @@
                             //"lengthMenu": [10, 30, 50],
                             "initComplete": function (settings, json) {
                                 $("#test_wrapper").append(spinner);
-                                $("#test").css("width", "100%");
+                                HilightRow();
+                                //$(window).trigger('resize');
                             },
                             "sScrollX": "100%",
                             "bScrollCollapse": true,
@@ -1076,7 +1310,7 @@
 
                         var chartData = [];
                         var rest = 0;
-                        chartData.push(['City', 'Visit']);
+                        chartData.push(['Region', 'Visit']);
                         dataSet.list.forEach(function (entry) {
                             var d = [];
                             d.push(entry.page);
@@ -1169,7 +1403,7 @@
             endDate: moment(endDate, "YYYY-MM-DD")
         }, cb);
 
-        $('#todo').html('<table id="test" class="hover order-column table-bordered table"></table>');
+        $('#todo').html('<table id="test" class="hover order-column table-bordered table" cellspacing="0" width="100%"></table>');
         $('#reportrange').addClass('hide-element');
         if (distributor) {
             RefreshNavBar(distributor, startDate, endDate);

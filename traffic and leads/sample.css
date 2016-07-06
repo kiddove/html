@@ -60,6 +60,14 @@ tbody td.return-visitor {
     padding-right: 1px;
 }
 
+    .myContent a {
+        font-size: 14px;
+    }
+
+    .myContent .navbar-brand {
+        font-size: 18px;
+    }
+
     .myContent .container-fluid {
         padding-left: initial;
         padding-right: initial;
@@ -69,6 +77,26 @@ tbody td.return-visitor {
         padding-left: 15px;
     }
 
+    .myContent table.dataTable tr {
+        white-space: nowrap;
+    }
+    /*.myContent table.dataTable tr td:hover {
+            overflow: visible;
+        }*/
+
+    /*.myContent .wd100 {
+        max-width: 150px;
+    }
+
+    .myContent .wd200 {
+        max-width: 300px;
+    }
+
+    .myContent .iffyTip {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }*/
     .myContent .navbar.navbar-inverse {
         background-color: #6B9BF5;
         border-color: transparent;
@@ -92,6 +120,10 @@ tbody td.return-visitor {
         height: 4em;
         width: 6em;
     }
+
+    /*.myContent table tbody > tr > td {
+        vertical-align: middle;
+    }*/
 
     .myContent .navbar-inverse .navbar-nav > .open > a,
     .myContent .navbar-inverse .navbar-nav > .open > a:focus,

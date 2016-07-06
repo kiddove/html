@@ -32,11 +32,22 @@ namespace ADSS
             public TimePair this_month { get; set; }
             public TimePair last_month { get; set; }
         }
-        private class Visit
+        private class PostReturn
         {
-            public int n { get; set; }
-            public int r { get; set; }
+            public int success { get; set; }
+            public string message { get; set; }
+            public string key { get; set; }
+            public PostReturn()
+            {
+                success = 0;
+                message = key = "";
+            }
         }
+        //private class Visit
+        //{
+        //    public int n { get; set; }
+        //    public int r { get; set; }
+        //}
         private class Visitor
         {
             public int n { get; set; }
@@ -45,7 +56,7 @@ namespace ADSS
         private class DefaultInfo
         {
             public string period { get; set; }
-            public Visit visit { get; set; }
+            public int visit { get; set; }
             public Visitor visitor { get; set; }
         }
         private class StatItem
@@ -63,6 +74,7 @@ namespace ADSS
             public string page { get; set; }
             public string time { get; set; }
             public int count { get; set; }
+            public string alias { get; set; }
         }
         private class PageViewItem
         {
@@ -70,11 +82,23 @@ namespace ADSS
             public int count { get; set; }
             public string percentage { get; set; }
         }
+        private class RegionItem : PageViewItem
+        {
+            public string province {get;set;}
+            public string country {get;set;}
+        }
         private class TopFiveStat
         {
             public List<PageViewItem> list { get; set; }
             public int total { get; set; }
         }
+
+        private class TopFiveStatRegion
+        {
+            public List<RegionItem> list { get; set; }
+            public int total { get; set; }
+        }
+
         private class PageAnalysisInfo
         {
             //public AnalyticsIdentity identity;
@@ -89,6 +113,7 @@ namespace ADSS
             public string type { get; set; }
             public string page { get; set; }
             public string refer { get; set; }
+            public string video { get; set; }
 
         }
         private class UploadAdsStat
@@ -97,6 +122,7 @@ namespace ADSS
             public string page { get; set; }
             public string distributor { get; set; }
             public string blog { get; set; }
+            public string token { get; set; }
         }
         private class UploadFingerPrint : UserFingerPrint
         {
@@ -107,6 +133,7 @@ namespace ADSS
             //public string visit_time { get; set; }  //getDate()
             public string distributor { get; set; }
             public string blog { get; set; }
+            public string video { get; set; }
         }
 
         public void ProcessRequest(HttpContext context)
@@ -138,20 +165,20 @@ namespace ADSS
                         case "dv":
                             strResult = getDetailVisitor(context.Request.QueryString["d"], context.Request.QueryString["s"], context.Request.QueryString["e"], context.Request.QueryString["b"]);
                             break;
-                        case "single":
-                            strResult = getSingleUser(Convert.ToString(context.Request.QueryString["a"]), Convert.ToString(context.Request.QueryString["d"]), Convert.ToString(context.Request.QueryString["s"]), Convert.ToString(context.Request.QueryString["e"]));
+                        case "si":  // single
+                            strResult = getSingleUser(Convert.ToString(context.Request.QueryString["a"]), Convert.ToString(context.Request.QueryString["d"]), Convert.ToString(context.Request.QueryString["s"]), Convert.ToString(context.Request.QueryString["e"]), context.Request.QueryString["b"]);
                             break;
                         case "vt":
-                            strResult = getVisitorTag(Convert.ToString(context.Request.QueryString["d"]), Convert.ToString(context.Request.QueryString["s"]), Convert.ToString(context.Request.QueryString["e"]));
+                            strResult = getVisitorTag(Convert.ToString(context.Request.QueryString["d"]), Convert.ToString(context.Request.QueryString["s"]), Convert.ToString(context.Request.QueryString["e"]), context.Request.QueryString["b"]);
                             break;
                         case "tot":
-                            strResult = getTrafficOverTime(Convert.ToString(context.Request.QueryString["d"]), Convert.ToString(context.Request.QueryString["s"]), Convert.ToString(context.Request.QueryString["e"]));
+                            strResult = getTrafficOverTime(Convert.ToString(context.Request.QueryString["d"]), Convert.ToString(context.Request.QueryString["s"]), Convert.ToString(context.Request.QueryString["e"]), context.Request.QueryString["b"]);
                             break;
                         case "pv":
-                            strResult = getPageView(Convert.ToString(context.Request.QueryString["d"]), Convert.ToString(context.Request.QueryString["s"]), Convert.ToString(context.Request.QueryString["e"]));
+                            strResult = getPageView(Convert.ToString(context.Request.QueryString["d"]), Convert.ToString(context.Request.QueryString["s"]), Convert.ToString(context.Request.QueryString["e"]), context.Request.QueryString["b"]);
                             break;
                         case "to":
-                            strResult = getTrfficOrigin(Convert.ToString(context.Request.QueryString["d"]), Convert.ToString(context.Request.QueryString["s"]), Convert.ToString(context.Request.QueryString["e"]));
+                            strResult = getTrafficOrigin(Convert.ToString(context.Request.QueryString["d"]), Convert.ToString(context.Request.QueryString["s"]), Convert.ToString(context.Request.QueryString["e"]), context.Request.QueryString["b"]);
                             break;
                         case "as":
                             strResult = getAdsStat(Convert.ToString(context.Request.QueryString["d"]), Convert.ToString(context.Request.QueryString["s"]), Convert.ToString(context.Request.QueryString["e"]), context.Request.QueryString["b"], context.Request.QueryString["u"]);
@@ -159,15 +186,18 @@ namespace ADSS
                         case "aqs":
                             strResult = getAdsQuickStat(Convert.ToString(context.Request.QueryString["d"]), Convert.ToString(context.Request.QueryString["s"]), Convert.ToString(context.Request.QueryString["e"]), context.Request.QueryString["b"]);
                             break;
+                        case "tfr":     // traffic from region, only use city
+                            strResult = getTrafficFromRegion(Convert.ToString(context.Request.QueryString["d"]), Convert.ToString(context.Request.QueryString["s"]), Convert.ToString(context.Request.QueryString["e"]), context.Request.QueryString["b"]);
+                            break;
                         default:
-                            strResult = getDefaultInfo(context.Request.QueryString["d"], context.Request.QueryString["ti"]);
+                            strResult = getDefaultInfo(context.Request.QueryString["d"], context.Request.QueryString["ti"], context.Request.QueryString["b"]);
                             break;
                     }
                 }
                 else
                 {
                     // default
-                    strResult = getDefaultInfo(context.Request.QueryString["d"], context.Request.QueryString["ti"]);
+                    strResult = getDefaultInfo(context.Request.QueryString["d"], context.Request.QueryString["ti"], context.Request.QueryString["b"]);
                 }
             }
             else if (context.Request.Form["update"] != null)
@@ -202,6 +232,59 @@ namespace ADSS
             context.Response.Write(strResult);
         }
 
+        private string getTrafficFromRegion(string distributor, string startDate, string endDate, string blog)
+        {
+            combineBlogDistributor(blog, distributor);
+            string strSQL;
+            try
+            {
+                string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, visit_time) >= '{0}'", startDate);
+                string strClause2 = String.IsNullOrEmpty(endDate) ? "" : string.Format(" and convert(date, visit_time) <= '{0}'", endDate);
+                strSQL = string.Format("select top 10 city, COUNT(*) as visit, COUNT(*) * 1.0 / SUM(COUNT(*)) over() as percentage, SUM(COUNT(*)) over() as total, province, country from tb_page_visit_info_xango where distributor='{0}'{1}{2} group by city, province, country order by percentage desc", distributor, strClause, strClause2);
+            }
+            catch (Exception e)
+            {
+                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getTrafficFromRegion) --- Exception: " + e.Message);
+                return "{}";
+            }
+
+            try
+            {
+                using (SqlConnection sc = new SqlConnection(ConfigurationManager.ConnectionStrings["sqlserver"].ConnectionString))
+                {
+                    if (sc != null)
+                    {
+                        DataSet ds = SqlHelper.ExecuteDataset(sc, CommandType.Text, strSQL);
+                        if (ds != null && ds.Tables.Count > 0)
+                        {
+                            TopFiveStatRegion tfs = new TopFiveStatRegion();
+                            tfs.list = new List<RegionItem>();
+                            for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                            {
+                                DataRow r = ds.Tables[0].Rows[i];
+                                RegionItem pv = new RegionItem();
+                                pv.page = Convert.ToString(r[0]);
+                                pv.count = Convert.ToInt32(r[1]);
+                                pv.percentage = string.Format("{0:P1}", Convert.ToSingle(r[2]));
+                                pv.province = Convert.ToString(r[4]);
+                                pv.country = Convert.ToString(r[5]);
+                                tfs.list.Add(pv);
+                                tfs.total = Convert.ToInt32(r[3]);
+                            }
+                            return new JavaScriptSerializer().Serialize(tfs);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                //Trace.WriteLine(e.Message);
+                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getTrafficFromRegion) --- Exception: " + e.Message + " --- sql: " + strSQL);
+            }
+
+            return "{}";
+        }
+
         private string getAdsQuickStat(string distributor, string startDate, string endDate, string blog)
         {
             combineBlogDistributor(blog, distributor);
@@ -211,7 +294,8 @@ namespace ADSS
                 string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, click_time) >= '{0}'", startDate);
                 string strClause2 = String.IsNullOrEmpty(endDate) ? "" : string.Format(" and convert(date, click_time) <= '{0}'", endDate);
 
-                strSQL = string.Format("select url, page, count(*) as c from tb_page_ads_click_stat where distributor='{0}'{1}{2} group by distributor, url, page order by c desc", distributor, strClause, strClause2);
+                //strSQL = string.Format("select url, page, count(*) as c from tb_page_ads_click_stat where distributor='{0}'{1}{2} group by distributor, url, page order by c desc", distributor, strClause, strClause2);
+                strSQL = string.Format("select url, count(*) as c from tb_page_ads_click_stat where distributor='{0}'{1}{2} group by distributor, url order by c desc", distributor, strClause, strClause2);
             }
             catch (Exception e)
             {
@@ -234,8 +318,8 @@ namespace ADSS
                                 DataRow r = ds.Tables[0].Rows[i];
                                 AdsStatItem ai = new AdsStatItem();
                                 ai.url = Convert.ToString(r[0]);
-                                ai.page = Convert.ToString(r[1]);
-                                ai.count = Convert.ToInt32(r[2]);
+                                //ai.page = Convert.ToString(r[1]);
+                                ai.count = Convert.ToInt32(r[1]);
                                 aList.Add(ai);
                             }
                             return new JavaScriptSerializer().Serialize(aList);
@@ -258,8 +342,8 @@ namespace ADSS
             string strSQL = "";
             try
             {
-                string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, click_time) >= '{0}'", startDate);
-                string strClause2 = String.IsNullOrEmpty(endDate) ? "" : string.Format(" and convert(date, click_time) <= '{0}'", endDate);
+                string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, a.click_time) >= '{0}'", startDate);
+                string strClause2 = String.IsNullOrEmpty(endDate) ? "" : string.Format(" and convert(date, a.click_time) <= '{0}'", endDate);
                 string strClause3 = "";
                 if (!string.IsNullOrEmpty(url))
                 {
@@ -268,7 +352,7 @@ namespace ADSS
                     strClause3 = string.Format(" and url = '{0}'", decodedString);
                 }
 
-                strSQL = string.Format("select url, page, click_time from tb_page_ads_click_stat where distributor='{0}'{1}{2}{3} order by click_time desc", distributor, strClause, strClause2, strClause3);
+                strSQL = string.Format("select a.url, a.page, a.click_time, b.alias from tb_page_visit_info_xango as b, tb_page_ads_click_stat as a where a.distributor='{0}'{1}{2}{3} and a.distributor = b.distributor and a.token = b.token group by a.url, a.page, a.click_time, b.alias order by a.click_time desc", distributor, strClause, strClause2, strClause3);
             }
             catch (Exception e)
             {
@@ -293,6 +377,7 @@ namespace ADSS
                                 ai.url = Convert.ToString(r[0]);
                                 ai.page = Convert.ToString(r[1]);
                                 ai.time = ((DateTime)r[2]).ToString("yyyy-MM-dd HH:mm:ss");
+                                ai.alias = Convert.ToString(r[3]);
                                 aList.Add(ai);
                             }
                             return new JavaScriptSerializer().Serialize(aList);
@@ -348,8 +433,8 @@ namespace ADSS
                     }
 
 
-                    strSQL = string.Format("insert into tb_page_ads_click_stat (url, page, distributor) values ('{0}', '{1}', '{2}')",
-                        uas.url, uas.page, string.IsNullOrEmpty(uas.distributor) ? uas.blog : uas.distributor);
+                    strSQL = string.Format("insert into tb_page_ads_click_stat (url, page, distributor, token) values ('{0}', '{1}', '{2}', '{3}')",
+                        uas.url, uas.page, string.IsNullOrEmpty(uas.distributor) ? uas.blog : uas.distributor, uas.token);
 
                     using (SqlConnection sc = new SqlConnection(ConfigurationManager.ConnectionStrings["sqlserver"].ConnectionString))
                     {
@@ -391,8 +476,8 @@ namespace ADSS
                     // visit_time, alias, type
                     string strSQL;
 
-                    strSQL = string.Format("insert into tb_page_visit_info_xango (token, ip, agent, language, color_depth, screen_resolution, time_zone, platform, device, os, country, province, city, province_code, refer, page, distributor) values ('{0}', '{1}', '{2}', '{3}', {4}, '{5}', {6}, '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}', '{14}', '{15}', '{16}')",
-                        uf.token, uf.ip, uf.agent, uf.language, uf.color_depth, uf.screen_resolution, uf.time_zone, uf.platform, uf.device, uf.os, uf.country, uf.province, uf.city, uf.province_code, uf.refer, uf.page, uf.distributor);
+                    strSQL = string.Format("insert into tb_page_visit_info_xango (token, ip, agent, language, color_depth, screen_resolution, time_zone, platform, device, os, country, province, city, province_code, refer, page, distributor, video) values ('{0}', '{1}', '{2}', '{3}', {4}, '{5}', {6}, '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}', '{14}', '{15}', '{16}', '{17}')",
+                        uf.token, uf.ip, uf.agent, uf.language, uf.color_depth, uf.screen_resolution, uf.time_zone, uf.platform, uf.device, uf.os, uf.country, uf.province, uf.city, uf.province_code, uf.refer, uf.page, uf.distributor, uf.video);
 
                     using (SqlConnection sc = new SqlConnection(ConfigurationManager.ConnectionStrings["sqlserver"].ConnectionString))
                     {
@@ -489,8 +574,9 @@ namespace ADSS
             return "";
         }
 
-        private string getTrfficOrigin(string distributor, string startDate, string endDate)
+        private string getTrafficOrigin(string distributor, string startDate, string endDate, string blog)
         {
+            combineBlogDistributor(blog, distributor);
             // select distinct(refer), COUNT(id) as visit from tb_page_visit_info_xango where distributor='paul' and visit_time >= '2016-05-05' and visit_time <= '2016-06-03' group by refer order by visit desc
             string strSQL = "";
             try
@@ -522,7 +608,7 @@ namespace ADSS
                                 PageViewItem pv = new PageViewItem();
                                 pv.page = Convert.ToString(r[0]);
                                 pv.count = Convert.ToInt32(r[1]);
-                                pv.percentage = string.Format("{0:P2}", Convert.ToSingle(r[2]));
+                                pv.percentage = string.Format("{0:P1}", Convert.ToSingle(r[2]));
                                 tfs.list.Add(pv);
                                 tfs.total = Convert.ToInt32(r[3]);
                             }
@@ -540,8 +626,9 @@ namespace ADSS
             return "{}";
         }
 
-        private string getPageView(string distributor, string startDate, string endDate)
+        private string getPageView(string distributor, string startDate, string endDate, string blog)
         {
+            combineBlogDistributor(blog, distributor);
             // select distinct(page), COUNT(id) as visit from tb_page_visit_info_xango where distributor='paul' and visit_time >= '2016-05-05' and visit_time <= '2016-06-03' group by page order by visit desc
             // select page, COUNT(*) as count, COUNT(*) * 100.0 / SUM(COUNT(*)) over() as percentage from tb_page_visit_info_xango where distributor='paul' and visit_time >= '2016-05-05' and visit_time <= '2016-06-03' group by page order by percentage desc
             string strSQL;
@@ -574,7 +661,7 @@ namespace ADSS
                                 PageViewItem pv = new PageViewItem();
                                 pv.page = Convert.ToString(r[0]);
                                 pv.count = Convert.ToInt32(r[1]);
-                                pv.percentage = string.Format("{0:P2}", Convert.ToSingle(r[2]));
+                                pv.percentage = string.Format("{0:P1}", Convert.ToSingle(r[2]));
                                 tfs.list.Add(pv);
                                 tfs.total = Convert.ToInt32(r[3]);
                             }
@@ -592,18 +679,84 @@ namespace ADSS
             return "{}";
         }
 
-        private string getTrafficOverTime(string distributor, string startDate, string endDate)
+        //private string getTrafficOverTime(string distributor, string startDate, string endDate, string blog)
+        //{
+        //    combineBlogDistributor(blog, distributor);
+        //    // select CAST(visit_time as DATE), COUNT(id) from tb_page_visit_info_xango where visit_time <= '2016-05-05' group by CAST(visit_time as DATE)
+        //    // select t3.d, t3.t, COUNT(t4.type)as c from tb_page_visit_info_xango t4 right join (select * from (select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango  where visit_time < '2016-01-01') t1 ,(select distinct type as t from tb_page_visit_info_xango) t2 ) t3 on CAST(t4.visit_time as DATE) = t3.d and t4.type = t3.t group by t3.d, t3.t order by t3.d, t3.t
+        //    string strSQL;
+        //    try
+        //    {
+        //        string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, visit_time) >= '{0}'", startDate);
+        //        string strClause2 = String.IsNullOrEmpty(endDate) ? "" : string.Format(" and convert(date, visit_time) <= '{0}'", endDate);
+        //        //string strHead = "select DATEDIFF(SECOND,{d '1970-01-01'}, t3.d), t3.t, COUNT(t4.type)as c ";
+        //        string strHead = "select t3.d, t3.t, COUNT(distinct t4.token)as visitor, COUNT(t4.type) as pageview ";
+        //        strSQL = strHead + string.Format("from tb_page_visit_info_xango t4 right join (select '{3}' as dis, * from (select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango  where distributor='{0}'{1}{2}) t1 ,(select distinct type as t from tb_page_visit_info_xango) t2 ) t3 on CAST(t4.visit_time as DATE) = t3.d and t4.type = t3.t and t4.distributor = '{0}' group by t3.d, t3.t order by t3.d, t3.t", distributor, strClause, strClause2, distributor);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        AdssLogger.WriteLog("GetSampleAnalyticsInfo(getTrafficOverTime) --- Exception: " + e.Message);
+        //        return "{}";
+        //    }
+        //    try
+        //    {
+        //        using (SqlConnection sc = new SqlConnection(ConfigurationManager.ConnectionStrings["sqlserver"].ConnectionString))
+        //        {
+        //            if (sc != null)
+        //            {
+        //                DataSet ds = SqlHelper.ExecuteDataset(sc, CommandType.Text, strSQL);
+        //                if (ds != null && ds.Tables.Count > 0)
+        //                {
+        //                    List<DefaultInfo> dInfo = new List<DefaultInfo>();
+        //                    DefaultInfo di = null;
+        //                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+        //                    {
+        //                        // d,t,visitor,pageview(visit)
+        //                        DataRow r = ds.Tables[0].Rows[i];
+        //                        if (i % 2 == 0)
+        //                        {
+        //                            di = new DefaultInfo();
+        //                            di.visit = new Visit();
+        //                            di.visitor = new Visitor();
+        //                        }
+
+        //                        //di.period = Convert.ToString(r[0]);
+        //                        di.period = ((DateTime)r[0]).ToString("yyyy-MM-dd");
+        //                        if (i % 2 == 0)
+        //                        {
+        //                            di.visit.n = Convert.ToInt32(r[3]);
+        //                            di.visitor.n = Convert.ToInt32(r[2]);
+        //                        }
+        //                        else
+        //                        {
+        //                            di.visit.r = Convert.ToInt32(r[3]);
+        //                            di.visitor.r = Convert.ToInt32(r[2]);
+        //                            dInfo.Add(di);
+        //                        }
+        //                    }
+        //                    return new JavaScriptSerializer().Serialize(dInfo);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        //Trace.WriteLine(e.Message);
+        //        AdssLogger.WriteLog("GetSampleAnalyticsInfo(getTrafficOverTime sql excute) --- Exception: " + e.Message + " --- sql: " + strSQL);
+        //    }
+        //    return "{}";
+        //}
+
+        private string getTrafficOverTime(string distributor, string startDate, string endDate, string blog)
         {
-            // select CAST(visit_time as DATE), COUNT(id) from tb_page_visit_info_xango where visit_time <= '2016-05-05' group by CAST(visit_time as DATE)
-            // select t3.d, t3.t, COUNT(t4.type)as c from tb_page_visit_info_xango t4 right join (select * from (select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango  where visit_time < '2016-01-01') t1 ,(select distinct type as t from tb_page_visit_info_xango) t2 ) t3 on CAST(t4.visit_time as DATE) = t3.d and t4.type = t3.t group by t3.d, t3.t order by t3.d, t3.t
+            combineBlogDistributor(blog, distributor);
             string strSQL;
             try
             {
                 string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, visit_time) >= '{0}'", startDate);
                 string strClause2 = String.IsNullOrEmpty(endDate) ? "" : string.Format(" and convert(date, visit_time) <= '{0}'", endDate);
-                //string strHead = "select DATEDIFF(SECOND,{d '1970-01-01'}, t3.d), t3.t, COUNT(t4.type)as c ";
-                string strHead = "select t3.d, t3.t, COUNT(distinct t4.token)as visitor, COUNT(t4.type) as pageview ";
-                strSQL = strHead + string.Format("from tb_page_visit_info_xango t4 right join (select '{3}' as dis, * from (select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango  where distributor='{0}'{1}{2}) t1 ,(select distinct type as t from tb_page_visit_info_xango) t2 ) t3 on CAST(t4.visit_time as DATE) = t3.d and t4.type = t3.t and t4.distributor = '{0}' group by t3.d, t3.t order by t3.d, t3.t", distributor, strClause, strClause2, distributor);
+
+                strSQL = string.Format("select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango where distributor='{0}'{1}{2}", distributor, strClause, strClause2);               
             }
             catch (Exception e)
             {
@@ -620,31 +773,31 @@ namespace ADSS
                         if (ds != null && ds.Tables.Count > 0)
                         {
                             List<DefaultInfo> dInfo = new List<DefaultInfo>();
-                            DefaultInfo di = null;
                             for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                             {
-                                // d,t,visitor,pageview(visit)
                                 DataRow r = ds.Tables[0].Rows[i];
-                                if (i % 2 == 0)
-                                {
-                                    di = new DefaultInfo();
-                                    di.visit = new Visit();
-                                    di.visitor = new Visitor();
-                                }
 
-                                //di.period = Convert.ToString(r[0]);
+                                DefaultInfo di = new DefaultInfo();
+                                di.visitor = new Visitor();
+
                                 di.period = ((DateTime)r[0]).ToString("yyyy-MM-dd");
-                                if (i % 2 == 0)
+
+                                string strSQL1 = string.Format("select COUNT(distinct token) as cnt from tb_page_visit_info_xango where distributor = '{0}' and type='new' and convert(date, visit_time) = '{1}'", distributor, di.period);
+                                DataSet ds1 = SqlHelper.ExecuteDataset(sc, CommandType.Text, strSQL1);
+                                if (ds1 != null && ds1.Tables.Count > 0)
                                 {
-                                    di.visit.n = Convert.ToInt32(r[3]);
-                                    di.visitor.n = Convert.ToInt32(r[2]);
+                                    DataRow r1 = ds1.Tables[0].Rows[0];
+                                    di.visitor.n = Convert.ToInt32(r1[0]);
+                                    string strSQL2 = string.Format("select COUNT(distinct token) as cnt, COUNT(*) as cnt_v from tb_page_visit_info_xango where distributor = '{0}' and convert(date, visit_time) = '{1}'", distributor, di.period);
+                                    DataSet ds2 = SqlHelper.ExecuteDataset(sc, CommandType.Text, strSQL2);
+                                    if (ds2 != null && ds1.Tables.Count > 0)
+                                    {
+                                        DataRow r2 = ds2.Tables[0].Rows[0];
+                                        di.visitor.r = Convert.ToInt32(r2[0]) - di.visitor.n;
+                                        di.visit = Convert.ToInt32(r2[1]);
+                                    }
                                 }
-                                else
-                                {
-                                    di.visit.r = Convert.ToInt32(r[3]);
-                                    di.visitor.r = Convert.ToInt32(r[2]);
-                                    dInfo.Add(di);
-                                }
+                                dInfo.Add(di);
                             }
                             return new JavaScriptSerializer().Serialize(dInfo);
                         }
@@ -659,8 +812,9 @@ namespace ADSS
             return "{}";
         }
 
-        private string getDefaultInfo(string distributor, string strJson)
+        private string getDefaultInfo(string distributor, string strJson, string blog)
         {
+            combineBlogDistributor(blog, distributor);
             if (String.IsNullOrEmpty(distributor) || String.IsNullOrEmpty(strJson))
                 return "{}";
             else
@@ -686,48 +840,88 @@ namespace ADSS
                         string strSQL5 = string.Format("select '{2}' as period, type, COUNT(distinct token) as cnt, COUNT(type) as cnt_v from tb_page_visit_info_xango where distributor = '{3}' and convert(date, visit_time) >= '{0}' and convert(date, visit_time) <= '{1}' group by type;", ti.last_month.start, ti.last_month.end, "Last month", distributor);
 
                         strSQL = strSQL1 + strSQL2 + strSQL3 + strSQL4 + strSQL5;
+
+                        List<string> times = new List<string>();
+                        times.Add(string.Format(" and convert(date, visit_time) >= '{0}' and convert(date, visit_time) < '{1}';", ti.yesterday.start, ti.yesterday.end));
+                        times.Add(string.Format(" and convert(date, visit_time) >= '{0}' and convert(date, visit_time) < '{1}';", ti.last_7_days.start, ti.last_7_days.end));
+                        times.Add(string.Format(" and convert(date, visit_time) >= '{0}' and convert(date, visit_time) < '{1}';", ti.last_30_days.start, ti.last_7_days.end));
+                        times.Add(string.Format(" and convert(date, visit_time) >= '{0}' and convert(date, visit_time) < '{1}';", ti.this_month.start, ti.this_month.end));
+                        times.Add(string.Format(" and convert(date, visit_time) >= '{0}' and convert(date, visit_time) < '{1}';", ti.last_month.start, ti.last_month.end));
                         using (SqlConnection sc = new SqlConnection(ConfigurationManager.ConnectionStrings["sqlserver"].ConnectionString))
                         {
                             if (sc != null)
                             {
-                                DataSet ds = SqlHelper.ExecuteDataset(sc, CommandType.Text, strSQL);
-                                if (ds != null && ds.Tables.Count > 0)
+                                // select count(new)
+                                // select count(*)
+                                // do minus --- return
+                                // because return can be new as well
+                                List<DefaultInfo> dInfo = new List<DefaultInfo>();
+                                for(int i = 0; i < times.Count; i++)
                                 {
-                                    List<DefaultInfo> dInfo = new List<DefaultInfo>();
-                                    for (int i = 0; i < ds.Tables.Count; i++)
+                                    DefaultInfo di = new DefaultInfo();
+                                    di.visitor = new Visitor();
+
+                                    strSQL = string.Format("select COUNT(distinct token) as cnt from tb_page_visit_info_xango where distributor = '{0}' and type='new'{1}", distributor, times[i]);
+                                    DataSet ds = SqlHelper.ExecuteDataset(sc, CommandType.Text, strSQL);
+                                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                                     {
-                                        DefaultInfo di = new DefaultInfo();
-                                        di.visit = new Visit();
-                                        di.visitor = new Visitor();
-                                        if (ds.Tables[i].Rows.Count == 0)
-                                        {
-                                            di.period = labels[i];
-                                            di.visit.n = di.visit.r = 0;
-                                            di.visitor.n = di.visitor.r = 0;
-                                        }
-                                        else
-                                        {
-                                            for (int j = 0; j < ds.Tables[i].Rows.Count; j++)
-                                            {
-                                                DataRow r = ds.Tables[i].Rows[j];
-                                                di.period = Convert.ToString(r[0]);
-                                                if (String.Compare("new", Convert.ToString(r[1]), StringComparison.OrdinalIgnoreCase) == 0)
-                                                {
-                                                    di.visitor.n = Convert.ToInt32(r[2]);
-                                                    di.visit.n = Convert.ToInt32(r[3]);
-                                                }
-                                                else if (String.Compare("return", Convert.ToString(r[1]), StringComparison.OrdinalIgnoreCase) == 0)
-                                                {
-                                                    di.visitor.r = Convert.ToInt32(r[2]);
-                                                    di.visit.r = Convert.ToInt32(r[3]);
-                                                }
-                                            }
-                                        }
-                                        dInfo.Add(di);
+                                        DataRow r = ds.Tables[0].Rows[0];
+                                        di.period = labels[i];
+                                        di.visitor.n = Convert.ToInt32(r[0]);
                                     }
 
-                                    return new JavaScriptSerializer().Serialize(dInfo);
+                                    strSQL = string.Format("select COUNT(distinct token) as cnt, COUNT(*) as cnt_v from tb_page_visit_info_xango where distributor = '{0}'{1}", distributor, times[i]);
+                                    ds = SqlHelper.ExecuteDataset(sc, CommandType.Text, strSQL);
+                                    if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+                                    {
+                                        DataRow r = ds.Tables[0].Rows[0];
+                                        di.period = labels[i];
+                                        di.visitor.r = Convert.ToInt32(r[0]) - di.visitor.n;
+                                        di.visit = Convert.ToInt32(r[1]);
+                                    }
+                                    dInfo.Add(di);
                                 }
+
+                                return new JavaScriptSerializer().Serialize(dInfo);
+
+                                //DataSet ds = SqlHelper.ExecuteDataset(sc, CommandType.Text, strSQL);
+                                //if (ds != null && ds.Tables.Count > 0)
+                                //{
+                                //    List<DefaultInfo> dInfo = new List<DefaultInfo>();
+                                //    for (int i = 0; i < ds.Tables.Count; i++)
+                                //    {
+                                //        DefaultInfo di = new DefaultInfo();
+                                //        di.visit = new Visit();
+                                //        di.visitor = new Visitor();
+                                //        if (ds.Tables[i].Rows.Count == 0)
+                                //        {
+                                //            di.period = labels[i];
+                                //            di.visit.n = di.visit.r = 0;
+                                //            di.visitor.n = di.visitor.r = 0;
+                                //        }
+                                //        else
+                                //        {
+                                //            for (int j = 0; j < ds.Tables[i].Rows.Count; j++)
+                                //            {
+                                //                DataRow r = ds.Tables[i].Rows[j];
+                                //                di.period = Convert.ToString(r[0]);
+                                //                if (String.Compare("new", Convert.ToString(r[1]), StringComparison.OrdinalIgnoreCase) == 0)
+                                //                {
+                                //                    di.visitor.n = Convert.ToInt32(r[2]);
+                                //                    di.visit.n = Convert.ToInt32(r[3]);
+                                //                }
+                                //                else if (String.Compare("return", Convert.ToString(r[1]), StringComparison.OrdinalIgnoreCase) == 0)
+                                //                {
+                                //                    di.visitor.r = Convert.ToInt32(r[2]);
+                                //                    di.visit.r = Convert.ToInt32(r[3]);
+                                //                }
+                                //            }
+                                //        }
+                                //        dInfo.Add(di);
+                                //    }
+
+                                //    return new JavaScriptSerializer().Serialize(dInfo);
+                                //}
                             }
                         }
                     }
@@ -752,7 +946,7 @@ namespace ADSS
 
 
                 //string strMain = "select alias, ip, DATEDIFF(SECOND,{d '1970-01-01'}, visit_time) as time, type, page, refer, country, province, city from tb_page_visit_info_xango where distributor = '" + distributor + "'";
-                string strMain = "select alias, ip, visit_time, type, page, refer, country, province, city, province_code from tb_page_visit_info_xango where distributor = '" + distributor + "'";
+                string strMain = "select alias, ip, visit_time, type, page, refer, country, province, city, province_code, video from tb_page_visit_info_xango where distributor = '" + distributor + "'";
                 //group by token, alias, country, province, city, language, device", startDate, endDate, strDistributor);
                 string strOrder = " order by visit_time desc";
                 strSQL = strMain + strClause + strClause2 + strOrder;
@@ -788,6 +982,7 @@ namespace ADSS
                                 dv.province = Convert.ToString(r[7]);
                                 dv.city = Convert.ToString(r[8]);
                                 dv.province_code = Convert.ToString(r[9]);
+                                dv.video = Convert.ToString(r[10]);
                                 if (String.Equals(dv.country, "all", StringComparison.OrdinalIgnoreCase))
                                 {
                                     dv.country = "";
@@ -965,8 +1160,9 @@ namespace ADSS
             // 2. update one by one....
         }
 
-        private string getSingleUser(string alias, string distributor, string startDate, string endDate)
+        private string getSingleUser(string alias, string distributor, string startDate, string endDate, string blog)
         {
+            combineBlogDistributor(blog, distributor);
             string strSQL = "";
             try
             {
@@ -981,14 +1177,14 @@ namespace ADSS
 
 
                 //string strMain = "select ip, country, province, city, DATEDIFF(SECOND,{d '1970-01-01'}, visit_time) as time from tb_page_visit_info_xango where distributor = '" + distributor + "' and alias='" + alias + "'";
-                string strMain = "select ip, country, province, city, visit_time from tb_page_visit_info_xango where distributor = '" + distributor + "' and alias='" + alias + "'";
+                string strMain = "select alias, ip, visit_time, type, page, refer, country, province, city, province_code, video from tb_page_visit_info_xango where distributor = '" + distributor + "' and alias='" + alias + "'";
                 //group by token, alias, country, province, city, language, device", startDate, endDate, strDistributor);
                 string strOrder = " order by visit_time desc";
                 strSQL = strMain + strClause + strClause2 + strOrder;
             }
             catch (Exception e)
             {
-                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getDetailInfo) --- Exception: " + e.Message);
+                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getSingleUser) --- Exception: " + e.Message);
                 return "{}";
             }
 
@@ -1001,32 +1197,38 @@ namespace ADSS
                         DataSet ds = SqlHelper.ExecuteDataset(sc, CommandType.Text, strSQL);
                         if (ds != null && ds.Tables.Count > 0)
                         {
-                            List<StatItem> sl = new List<StatItem>();
+                            List<DetailVisitor> dl = new List<DetailVisitor>();
                             for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                             {
                                 DataRow r = ds.Tables[0].Rows[i];
-                                StatItem si = new StatItem();
-                                si.ip = Convert.ToString(r[0]);
-                                si.country = Convert.ToString(r[1]);
-                                si.province = Convert.ToString(r[2]);
-                                si.city = Convert.ToString(r[3]);
-                                //si.time = Convert.ToString(r[4]);
-                                si.time = ((DateTime)r[4]).ToString("yyyy-MM-dd HH:mm:ss");
-                                if (String.Equals(si.country, "all", StringComparison.OrdinalIgnoreCase))
+                                DetailVisitor dv = new DetailVisitor();
+                                dv.alias = Convert.ToString(r[0]);
+                                dv.ip = Convert.ToString(r[1]);
+                                //dv.time = Convert.ToString(r[2]);
+                                dv.time = ((DateTime)r[2]).ToString("yyyy-MM-dd HH:mm:ss");
+                                dv.type = Convert.ToString(r[3]);
+                                dv.page = Convert.ToString(r[4]);
+                                dv.refer = Convert.ToString(r[5]);
+                                dv.country = Convert.ToString(r[6]);
+                                dv.province = Convert.ToString(r[7]);
+                                dv.city = Convert.ToString(r[8]);
+                                dv.province_code = Convert.ToString(r[9]);
+                                dv.video = Convert.ToString(r[10]);
+                                if (String.Equals(dv.country, "all", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    si.country = "";
+                                    dv.country = "";
                                 }
-                                if (String.Equals(si.province, "all", StringComparison.OrdinalIgnoreCase))
+                                if (String.Equals(dv.province, "all", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    si.province = "";
+                                    dv.province = "";
                                 }
-                                if (String.Equals(si.city, "all", StringComparison.OrdinalIgnoreCase))
+                                if (String.Equals(dv.city, "all", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    si.city = "";
+                                    dv.city = "";
                                 }
-                                sl.Add(si);
+                                dl.Add(dv);
                             }
-                            return new JavaScriptSerializer().Serialize(sl);
+                            return new JavaScriptSerializer().Serialize(dl);
                         }
                     }
                 }
@@ -1034,16 +1236,17 @@ namespace ADSS
             catch (Exception e)
             {
                 //Trace.WriteLine(e.Message);
-                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getDetailInfo sql excute) --- Exception: " + e.Message + " --- sql: " + strSQL);
+                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getSingleUser sql excute) --- Exception: " + e.Message + " --- sql: " + strSQL);
             }
             return "{}";
         }
 
-        private string getVisitorTag(string strDistributor, string startDate, string endDate)
+        private string getVisitorTag(string distributor, string startDate, string endDate, string blog)
         {
+            combineBlogDistributor(blog, distributor);
             string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, visit_time) >= '{0}'", startDate);
             string strClause2 = String.IsNullOrEmpty(endDate) ? "" : string.Format(" and convert(date, visit_time) <= '{0}'", endDate);
-            string strMain = string.Format("select distinct alias, COUNT(alias)as count, language, device from tb_page_visit_info_xango where distributor = '{0}'", strDistributor);
+            string strMain = string.Format("select distinct alias, COUNT(alias)as count, language, device from tb_page_visit_info_xango where distributor = '{0}'", distributor);
             //group by token, alias, country, province, city, language, device", startDate, endDate, strDistributor);
             string strRear = " group by alias, language, device";
 
@@ -1100,7 +1303,8 @@ namespace ADSS
 
         private string updateAlias(string oldValue, string newValue, string distributor)
         {
-            string strRet = "";
+            PostReturn pr = new PostReturn();
+            pr.key = oldValue;
             string strSQL = string.Format("select * from tb_page_visit_info_xango where alias = '{0}' and distributor='{1}'", newValue, distributor);
             //string strSQL = "select * from tb_page_visit_info_xango where alias = '" + newValue + "' and distributor='" + distributor + "'";
             try
@@ -1114,8 +1318,8 @@ namespace ADSS
                         {
                             if (ds.Tables[0].Rows.Count > 0)
                             {
-                                strRet = string.Format("Alias already exists. Please enter another one.");
-                                return strRet;
+                                pr.message = string.Format("Alias already exists. Please enter another one.");
+                                //return strRet;
                             }
                             else
                             {
@@ -1123,11 +1327,12 @@ namespace ADSS
                                 {
                                     strSQL = string.Format("update tb_page_visit_info_xango set alias = '{0}' where alias = '{1}' and distributor='{2}'", newValue, oldValue, distributor);
                                     SqlHelper.ExecuteNonQuery(sc, CommandType.Text, strSQL);
+                                    pr.success = 1;
                                 }
                                 catch (Exception e)
                                 {
                                     AdssLogger.WriteLog("Exception in updateAlias(): " + e.Message);
-                                    strRet = "Operation failed.";
+                                    pr.message = "Operation failed.";
                                 }
                             }
                         }
@@ -1138,9 +1343,10 @@ namespace ADSS
             {
                 //Trace.WriteLine(e.Message);
                 AdssLogger.WriteLog("GetSampleAnalyticsInfo(getResult) --- Exception: " + e.Message + " --- sql: " + strSQL);
-                strRet = "Operation failed.";
+                pr.message = "Operation failed.";
             }
-            return strRet;
+
+            return new JavaScriptSerializer().Serialize(pr);
         }
 
         public bool IsReusable

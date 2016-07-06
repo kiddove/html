@@ -49,7 +49,9 @@
             uploadObj.distributor = distributor;
             uploadObj.refer = document.referrer;
             uploadObj.page = window.location.pathname;
-
+            //console.log(stricon);
+            if (stricon)
+                uploadObj.video = stricon;
             if (uploadObj.distributor) {
                 var params = JSON.stringify(uploadObj);
 

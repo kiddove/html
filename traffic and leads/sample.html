@@ -18,10 +18,17 @@
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
-    <!--sort table-->
     <!--originnal jquery datatable-->
     <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css" />
+
+    <!--fixed column-->
+<!--    <script type="text/javascript" src="https://cdn.datatables.net/fixedcolumns/3.2.2/js/dataTables.fixedColumns.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/3.2.2/css/fixedColumns.dataTables.min.css"/>-->
+
+    <!--elipsis-->
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.12/dataRender/ellipsis.js"></script>
+    
 
     <!--Parse, validate, manipulate, and display dates in JavaScript. http://momentjs.com/-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
@@ -41,15 +48,17 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core-min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64-min.js"></script>
 
+    <script src="bootbox.min.js"></script>
     <script src="sample.js"></script>
     <link rel="stylesheet" type="text/css" href="sample.css">
+
 
     <!--    <script src="fingerprint2.js"></script>
     <script src="stat.js"></script>-->
 
 </head>
 <body>
-    <div class="myContent">
+    <div class="myContent" style="min-width: 800px;margin: 0 auto;">
         <nav class="navbar navbar-inverse">
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -74,7 +83,6 @@
                                 <li><a href="#" id="to">Traffic Origin</a></li>
                             </ul>
                         </li>
-                        <!--<li><a href="#" id="as">Ads Stat</a></li>-->
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="as">Ads Stat
                             <span class="caret"></span></a>
@@ -83,7 +91,6 @@
                                 <li><a href="#" id="acd">Click Detail</a></li>
                             </ul>
                         </li>
-                        <!--<li><a href="#" id="ls">Leads Stat</a></li>-->
                     </ul>
                 </div>
             </div>
@@ -95,7 +102,7 @@
                 <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
                 <span></span><b class="caret"></b>
             </div>
-            <div class="table-responsive" id="todo">
+            <div class="table-responsive1" id="todo">
                 <div id="spinner" class="spinner hide-element">
                     <img id="img-spinner" src="ajax-loader.gif" alt="Loading" />
                 </div>
