@@ -40,6 +40,11 @@
             return true;
         }
     }
+
+    function isValid(str) {
+        return !/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g.test(str);
+    }
+
     var table;
     var pageType = getParameterByName('t');
     var adUrl;
@@ -246,7 +251,7 @@
                 validate: function (value) {
                     if ($.trim(value) == '') {
                         return 'This field is required';
-                    } else if (value.indexOf('#') > -1) {
+                    } else if (!isValid(value)) {
                         return 'Cannot contain special charactors';
                     }
                 },
@@ -948,7 +953,7 @@
                 validate: function (value) {
                     if ($.trim(value) == '') {
                         return 'This field is required';
-                    } else if (value.indexOf('#') > -1) {
+                    } else if (!isValid(value)) {
                         return 'Cannot contain special charactors';
                     }
                 },
