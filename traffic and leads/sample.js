@@ -199,7 +199,7 @@
             table = $('#test').DataTable({
                 //"processing": true,
                 //"serverSide": true,
-                "destroy": true,
+                //"destroy": true,
                 "ajax": {
                     "url": "http://206.190.131.92:6009/SampleAnalytics.ashx?d=" + distributor + "&ti=" + JSON.stringify(time_period),
                     //"type": 'POST',
@@ -228,28 +228,15 @@
                     }
                 ],
 
-                //"deferRender": true,
+                "deferRender": true,
                 "ordering": false,
                 "searching": false,
                 "paging": false,
                 //"pagingType": "simple_numbers",
                 "info": false,
-                //"order": [],
-                //"fixedHeader": true,
-                //"responsive": true,
-                //"lengthMenu": [20, 50, 80],
-                //"stateSave": true
-                //"initComplete": function (settings, json) {
-                //    $('#test tbody').on('click', 'td', function (e, data) {
-                //        console.log('Data: ' + $(this).html().trim());
-                //        console.log('Row: ' + $(this).parent().find('td').html().trim());
-                //        console.log('Column:' + $('#test thead tr th').eq($(this).index()).html().trim());
-                //    });
-                //},
                 "initComplete": function (settings, json) {
                     $("#test_wrapper").append(spinner);
                     HilightRow();
-                    //$(window).trigger('resize');
                 }
             });
         }
@@ -333,6 +320,7 @@
             };
             $('#reportrange').removeClass('hide-element');
             table = $('#test').DataTable({
+                //"dom": '<"top"lf>t<"bottom"ip>',
                 //"processing": true,
                 //"serverSide": true,
                 "autoWidth": true,
@@ -342,7 +330,6 @@
                     //"type": 'POST',
                     "dataSrc": ""
                 },
-
                 "columns": [
                     {
                         "title": "Visitor", "data": "alias", "render": function (data, type, row, meta) {
@@ -376,7 +363,6 @@
                                 city = full.city + ', ';
                             if (full.province)
                                 province = full.province + ', ';
-                            //return city + province + full.country;
 
                             if (type === "display") {
                                 return $.fn.dataTable.render.ellipsis(30)(city + province + full.country, type, full);
@@ -386,15 +372,6 @@
                     },
                     {
                         "title": "Referrer", "data": "refer", "render": function (data, type, full, meta) {
-                            //if (type === "display" || type === 'filter') {
-                            //    if (!data)
-                            //        return 'Direct Access';
-                            //    else
-                            //        return data;
-                            //}
-
-                            //return data;
-
                             if (type === "filter") {
                                 if (!data)
                                     return 'Direct Access';
@@ -410,35 +387,9 @@
                             return data;
                         }
                     },
-                    //{
-                    //    "title": "Country", "data": "country", "render": function (data, type, full, meta) {
-                    //        if (type === "display" || type === "filter")
-                    //            if (!data)
-                    //                return "N/A";
-                    //        return data;
-                    //    }
-                    //},
-                    //{
-                    //    "title": "Region", "data": "province", "render": function (data, type, full, meta) {
-                    //        if (type === "display" || type === "filter")
-                    //            if (!data)
-                    //                return "N/A";
-                    //        return data;
-                    //    }
-                    //},
-                    //{
-                    //    "title": "City", "data": "city", "render": function (data, type, full, meta) {
-                    //        if (type === "display" || type === "filter")
-                    //            if (!data)
-                    //                return "N/A";
-                    //        return data;
-                    //    }
-                    //},
                     { "title": "IP", "data": "ip" },
-
                 ],
-
-                //"deferRender": true,
+                "deferRender": true,
                 "ordering": true,
                 "searching": true,
                 "paging": true,
@@ -455,22 +406,9 @@
                 "initComplete": function (settings, json) {
                     $("#test_wrapper").append(spinner);
                     HilightRow();
-                    //table.columns.adjust().draw();
                 },
-                //"sScrollX": "100%",
                 "bScrollCollapse": true,
                 scrollX: true,
-                //"autoWidth": false,
-                //"columnDefs": [
-                //    {
-                //        "targets": [5, 6],
-                //        render: $.fn.dataTable.render.ellipsis(30)
-                //    }
-                //]
-                //if editable can not be fixed
-                //fixedColumns: {
-                //    leftColumns:1
-                //}
 
                 //"createdRow": function (row, data, index) {
                 //    if (data.video) {
@@ -535,7 +473,7 @@
                                 }
                             ],
 
-                            //"deferRender": true,
+                            "deferRender": true,
                             "ordering": true,
                             "searching": true,
                             "paging": true,
@@ -546,13 +484,7 @@
                             //"responsive": true,
                             "lengthMenu": [20, 50, 80],
                             //"stateSave": true
-                            //"initComplete": function (settings, json) {
-                            //    $('#test tbody').on('click', 'td', function (e, data) {
-                            //        console.log('Data: ' + $(this).html().trim());
-                            //        console.log('Row: ' + $(this).parent().find('td').html().trim());
-                            //        console.log('Column:' + $('#test thead tr th').eq($(this).index()).html().trim());
-                            //    });
-                            //},
+
                             "initComplete": function (settings, json) {
                                 $("#test_wrapper").append(spinner);
                                 HilightRow();
@@ -668,6 +600,7 @@
                                 { "title": "Visit", "data": "count" },
                                 { "title": "Percentage", "data": "percentage" }
                             ],
+                            "deferRender": true,
                             "ordering": true,
                             "searching": true,
                             "paging": false,
@@ -775,14 +708,6 @@
                             "columns": [
                                {
                                    "title": "Referrer", "data": "page", "render": function (data, type, full, meta) {
-                                       //if (type === "display" || type === 'filter') {
-                                       //    if (!data)
-                                       //        return 'Direct Access';
-                                       //    else
-                                       //        return data;
-                                       //}
-
-                                       //return data;
                                        if (type === "filter") {
                                            if (!data)
                                                return 'Direct Access';
@@ -801,6 +726,7 @@
                                { "title": "Visit", "data": "count" },
                                { "title": "Percentage", "data": "percentage" }
                             ],
+                            "deferRender": true,
                             "ordering": true,
                             "searching": true,
                             "paging": false,
@@ -939,7 +865,7 @@
                     }
                 ],
 
-                //"deferRender": true,
+                "deferRender": true,
                 "ordering": true,
                 "searching": true,
                 "paging": true,
@@ -995,7 +921,7 @@
                     { "title": "Count", "data": "count" }
                 ],
 
-                //"deferRender": true,
+                "deferRender": true,
                 "ordering": true,
                 "searching": true,
                 "paging": true,
@@ -1094,39 +1020,6 @@
                     }
                 }
             };
-            //var saveFn = function (e, params) {
-            //    var $td = $(e.target).closest('td');
-            //    var newValue = params.newValue;
-            //    var oldValue = $td.children('a').html();
-            //    // send ajax post request, if alias exist, then prompt error.
-
-            //    $.ajax({
-            //        type: "POST",
-            //        url: "http://206.190.131.92:6009/SampleAnalytics.ashx",
-            //        data: {
-            //            update: new Date().getTime(),
-            //            t: 'a',
-            //            o: oldValue,
-            //            n: newValue,
-            //            d: distributor
-            //        },
-            //        success: function (data, status) {
-            //            // todo what if failed, when alias already exists.
-            //            //console.log(data);
-            //        }
-            //    });
-
-            //    // change all match cells value
-            //    table.column(0).nodes().each(function (node, index, dt) {
-            //        if (table.cell(node).data() == oldValue) {
-            //            table.cell(node).data(newValue);
-            //            var cell = table.cell(node).node();
-
-            //            $(cell).children('a').editable(edit_option);
-            //            $(cell).children('a').one('save', saveFn);
-            //        }
-            //    });
-            //};
 
             $('#reportrange').removeClass('hide-element');
             table = $('#test').DataTable({
@@ -1182,14 +1075,6 @@
                     },
                     {
                         "title": "Referrer", "data": "refer", "render": function (data, type, full, meta) {
-                            //if (type === "display" || type === 'filter') {
-                            //    if (!data)
-                            //        return 'Direct Access';
-                            //    else
-                            //        return data;
-                            //}
-
-                            //return data;
                             if (type === "filter") {
                                 if (!data)
                                     return 'Direct Access';
@@ -1205,34 +1090,10 @@
                             return data;
                         }
                     },
-                    //{
-                    //    "title": "Country", "data": "country", "render": function (data, type, full, meta) {
-                    //        if (type === "display" || type === "filter")
-                    //            if (!data)
-                    //                return "N/A";
-                    //        return data;
-                    //    }
-                    //},
-                    //{
-                    //    "title": "Region", "data": "province", "render": function (data, type, full, meta) {
-                    //        if (type === "display" || type === "filter")
-                    //            if (!data)
-                    //                return "N/A";
-                    //        return data;
-                    //    }
-                    //},
-                    //{
-                    //    "title": "City", "data": "city", "render": function (data, type, full, meta) {
-                    //        if (type === "display" || type === "filter")
-                    //            if (!data)
-                    //                return "N/A";
-                    //        return data;
-                    //    }
-                    //},
                     { "title": "IP", "data": "ip" }
                 ],
 
-                //"deferRender": true,
+                "deferRender": true,
                 "ordering": true,
                 "searching": true,
                 "paging": true,
@@ -1291,6 +1152,7 @@
                                 { "title": "Visit", "data": "count" },
                                 { "title": "Percentage", "data": "percentage" }
                             ],
+                            "deferRender": true,
                             "ordering": true,
                             "searching": true,
                             "paging": false,
@@ -1319,7 +1181,7 @@
                             rest += entry.count;
                         });
                         if (dataSet.total > rest)
-                            chartData.push(["Other Region", dataSet.total - rest]);
+                            chartData.push(["Other Regions", dataSet.total - rest]);
 
 
                         function drawPvChart() {
