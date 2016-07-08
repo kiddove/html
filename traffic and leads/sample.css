@@ -48,7 +48,7 @@ tbody td.return-visitor {
     margin-top: -16px; /* half height of the spinner gif */
     text-align: center;
     z-index: 1234;
-    overflow: auto;
+    /*overflow: auto;*/
     width: 32px; /* width of the spinner gif */
     height: 32px; /*hight of the spinner gif +2px to fix IE8 issue */
 }
@@ -116,7 +116,7 @@ tbody td.return-visitor {
                 color: #333;
             }
 
-    .myContent table td img {
+    .myContent table td .img-thumbnail {
         height: 4em;
         width: 6em;
     }
@@ -131,12 +131,12 @@ tbody td.return-visitor {
         background-color: #6B9BF5;
     }
 
-    .myContent img:hover {
-        -webkit-transform: scale(2.0);
-        transform: scale(2.0);
+    .myContent .img-thumbnail:hover {
+        -webkit-transform: scale(2.5);
+        transform: scale(2.5);
     }
 
-    .myContent img {
+    .myContent .img-thumbnail {
         -webkit-transition: all 0.7s ease;
         transition: all 0.7s ease;
     }

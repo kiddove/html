@@ -1,5 +1,5 @@
 (function (window, document, undefined) {
-
+    "use strict";
     function getParameterByName(name, url) {
         if (!url) url = window.location.href;
         name = name.replace(/[\[\]]/g, "\\$&");
@@ -15,7 +15,7 @@
         //Retrieve the new data with $.getJSON. You could use it ajax too
         $.getJSON(urlData, null, function (json) {
             table = $(tableId).dataTable();
-            oSettings = table.fnSettings();
+            var oSettings = table.fnSettings();
 
             table.fnClearTable(this);
 
@@ -56,16 +56,12 @@
         alias = getParameterByName('a');
     }
 
-    var distributor = "kectech";
-    //var distributor = "brendacook";
-    //var distributor;
+    var distributor;
     if (typeof showname !== 'undefined') {
         distributor = showname;
     }
 
-    var blogname = "healthylife";
-    //var blogname = "brendacook";
-    //var blogname;
+    var blogname;
     if (typeof blog !== 'undefined') {
         var result = blog.split('/');
         if (result && result.length > 4) {
@@ -363,7 +359,8 @@
                     },
                     {
                         "title": "Location", "data": "", "render": function (data, type, full, meta) {
-                            var city = province = country = "";
+                            var city, province, country;
+                            city = province = country = "";
                             if (full.city)
                                 city = full.city + ', ';
                             if (full.province)
@@ -1066,12 +1063,13 @@
                     },
                     {
                         "title": "Location", "data": "", "render": function (data, type, full, meta) {
-                            var city = province = country = "";
+                            var city, province, country;
+                            city = province = country = "";
                             if (full.city)
                                 city = full.city + ', ';
                             if (full.province)
                                 province = full.province + ', ';
-                            //return city + province + full.country;
+
                             if (type === "display") {
                                 return $.fn.dataTable.render.ellipsis(30)(city + province + full.country, type, full);
                             } else
@@ -1285,30 +1283,25 @@
                     // traffic over time
                     $("#title").html('Traffic Over Time');
                     InitTrafficOverTime(distributor, pageType, startDate, endDate);
-                    //$('#tot').addClass('type-selected');
                     $('#ts').addClass('type-selected');
                 } else if (pageType.toLowerCase() === 'pv') {
                     // page view
                     $("#title").html('Page Views(Top 10)');
                     InitPageView(distributor, pageType, startDate, endDate);
-                    //$('#pv').addClass('type-selected');
                     $('#ts').addClass('type-selected');
                 } else if (pageType.toLowerCase() === 'to') {
                     // traffic origin -- refer
                     $("#title").html('Traffic Origin(Top 5)');
                     InitTrafficOrigin(distributor, pageType, startDate, endDate);
-                    //$('#to').addClass('type-selected');
                     $('#ts').addClass('type-selected');
                 } else if (pageType.toLowerCase() === 'as') {
                     $("#title").html('Ads Details');
                     InitAdsStat(distributor, pageType, startDate, endDate, adUrl);
                     $('#as').addClass('type-selected');
-                    //$('#acd').addClass('type-selected');
                 } else if (pageType.toLowerCase() === 'aqs') {
                     $("#title").html('Ads Quick Stats');
                     InitAdsQuickStat(distributor, pageType, startDate, endDate, adUrl);
                     $('#as').addClass('type-selected');
-                    //$('#aqs').addClass('type-selected');
                 } else if (pageType.toLowerCase() === 'si') {
                     // single visitors
                     $("#title").html('Visit Detail');
@@ -1318,7 +1311,6 @@
                     // single visitors
                     $("#title").html('Traffic From Region(Top 10)');
                     InitTrafficFromRegion(distributor, pageType, startDate, endDate, blogname);
-                    //$('#tfr').addClass('type-selected');
                     $('#ts').addClass('type-selected');
                 } else {
                     $("#title").html('Quick Stats');

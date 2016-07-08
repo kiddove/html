@@ -218,7 +218,8 @@ namespace ADSS
         public static GeoLocation GetGeoLocation(string strIP)
         {
             GeoLocation gl = GetGeoLocationFromDB(strIP);
-            if (string.IsNullOrEmpty(gl.ip))
+            if (string.IsNullOrEmpty(gl.ip) || String.Equals(gl.country_name, "all", StringComparison.OrdinalIgnoreCase)
+                || String.Equals(gl.region_name, "all", StringComparison.OrdinalIgnoreCase) || String.Equals(gl.city, "all", StringComparison.OrdinalIgnoreCase))
                 gl = GetGeoLocationFromHttp(strIP);
             return gl;
         }
@@ -241,8 +242,46 @@ namespace ADSS
                 }
             }
 
-            if (!string.IsNullOrEmpty(gl.ip))
+            if (string.IsNullOrEmpty(gl.ip) || String.Equals(gl.country_name, "all", StringComparison.OrdinalIgnoreCase)
+                || String.Equals(gl.region_name, "all", StringComparison.OrdinalIgnoreCase) || String.Equals(gl.city, "all", StringComparison.OrdinalIgnoreCase))
+            {
+                // try ip api http://ip-api.com/json/114.187.79.6
+                GeoLocation gl_ipapi = GetGeoLocationFromIPAPI(strIP);
+                if (string.IsNullOrEmpty(gl_ipapi.ip))
                 InsertGeoLocation(gl);
+            }
+            return gl;
+        }
+
+        public static GeoLocation GetGeoLocationFromIPAPI(string strIP)
+        {
+            GeoLocation_IPAPI gl = new GeoLocation_IPAPI();
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://ip-api.com/json/" + strIP);
+            req.Method = "GET";
+            req.KeepAlive = false;
+            WebResponse wres = req.GetResponse();
+            HttpStatusCode iRet = ((HttpWebResponse)wres).StatusCode;
+            if (iRet == HttpStatusCode.OK)
+            {
+                using (Stream stm = wres.GetResponseStream())
+                {
+                    StreamReader sr = new StreamReader(stm, Encoding.UTF8);
+                    string strJson = sr.ReadToEnd();
+
+                    gl = new JavaScriptSerializer().Deserialize<GeoLocation_IPAPI>(strJson);
+                }
+            }
+
+            if (String.Equals(gl.status, "success", StringComparison.OrdinalIgnoreCase))
+            {
+
+            }
+            if (string.IsNullOrEmpty(gl.ip) || String.Equals(gl.country_name, "all", StringComparison.OrdinalIgnoreCase)
+                || String.Equals(gl.region_name, "all", StringComparison.OrdinalIgnoreCase) || String.Equals(gl.city, "all", StringComparison.OrdinalIgnoreCase))
+            {
+                // try ip api http://ip-api.com/json/114.187.79.6
+                InsertGeoLocation(gl);
+            }
             return gl;
         }
 
