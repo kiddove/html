@@ -240,7 +240,8 @@ namespace ADSS
             {
                 string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, visit_time) >= '{0}'", startDate);
                 string strClause2 = String.IsNullOrEmpty(endDate) ? "" : string.Format(" and convert(date, visit_time) <= '{0}'", endDate);
-                strSQL = string.Format("select top 10 city, COUNT(*) as visit, COUNT(*) * 1.0 / SUM(COUNT(*)) over() as percentage, SUM(COUNT(*)) over() as total, province, country from tb_page_visit_info_xango where distributor='{0}'{1}{2} group by city, province, country order by percentage desc", distributor, strClause, strClause2);
+                //strSQL = string.Format("select top 10 city, COUNT(*) as visit, COUNT(*) * 1.0 / SUM(COUNT(*)) over() as percentage, SUM(COUNT(*)) over() as total, province, country from tb_page_visit_info_xango where distributor='{0}'{1}{2} group by city, province, country order by percentage desc", distributor, strClause, strClause2);
+                strSQL = string.Format("select top 10 f.city, COUNT(*) as visit, COUNT(*) * 1.0 / SUM(COUNT(*)) over() as percentage, SUM(COUNT(*)) over() as total, f.province, f.country from (select b.city, b.province, b.country from tb_page_visit_info_xango as a , tb_geolocation as b where a.ip = b.ip and a.distributor = '{0}'{1}{2}) as f group by f.city, f.province, f.country order by percentage desc", distributor, strClause, strClause2);
             }
             catch (Exception e)
             {
@@ -471,7 +472,7 @@ namespace ADSS
                     uf.country = string.IsNullOrEmpty(gl.country_name) ? "all" : gl.country_name;
                     uf.province = string.IsNullOrEmpty(gl.region_name) ? "all" : gl.region_name;
                     uf.city = string.IsNullOrEmpty(gl.city) ? "all" : gl.city;
-                    uf.province_code = string.IsNullOrEmpty(gl.region_code) ? "all" : gl.region_code;
+                    uf.province_code = string.IsNullOrEmpty(gl.region_code) ? "" : gl.region_code;
                     uf.ip = gl.ip;
                     // visit_time, alias, type
                     string strSQL;
@@ -515,7 +516,7 @@ namespace ADSS
                     uf.country = string.IsNullOrEmpty(gl.country_name) ? "all" : gl.country_name;
                     uf.province = string.IsNullOrEmpty(gl.region_name) ? "all" : gl.region_name;
                     uf.city = string.IsNullOrEmpty(gl.city) ? "all" : gl.city;
-                    uf.province_code = string.IsNullOrEmpty(gl.region_code) ? "all" : gl.region_code;
+                    uf.province_code = string.IsNullOrEmpty(gl.region_code) ? "" : gl.region_code;
                     uf.ip = gl.ip;
                     // visit_time, alias, type
                     string strSQL = "";
@@ -756,7 +757,7 @@ namespace ADSS
                 string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, visit_time) >= '{0}'", startDate);
                 string strClause2 = String.IsNullOrEmpty(endDate) ? "" : string.Format(" and convert(date, visit_time) <= '{0}'", endDate);
 
-                strSQL = string.Format("select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango where distributor='{0}'{1}{2}", distributor, strClause, strClause2);               
+                strSQL = string.Format("select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango where distributor='{0}'{1}{2} order by d", distributor, strClause, strClause2);               
             }
             catch (Exception e)
             {
@@ -946,9 +947,9 @@ namespace ADSS
 
 
                 //string strMain = "select alias, ip, DATEDIFF(SECOND,{d '1970-01-01'}, visit_time) as time, type, page, refer, country, province, city from tb_page_visit_info_xango where distributor = '" + distributor + "'";
-                string strMain = "select alias, ip, visit_time, type, page, refer, country, province, city, province_code, video from tb_page_visit_info_xango where distributor = '" + distributor + "'";
+                string strMain = "select a.alias, b.ip, a.visit_time, a.type, a.page, a.refer, b.country, b.province, b.city, b.province_code, a.video from tb_page_visit_info_xango as a, tb_geolocation as b where a.distributor = '" + distributor + "' and a.ip = b.ip";
                 //group by token, alias, country, province, city, language, device", startDate, endDate, strDistributor);
-                string strOrder = " order by visit_time desc";
+                string strOrder = " order by a.visit_time desc";
                 strSQL = strMain + strClause + strClause2 + strOrder;
             }
             catch (Exception e)
@@ -1177,9 +1178,9 @@ namespace ADSS
 
 
                 //string strMain = "select ip, country, province, city, DATEDIFF(SECOND,{d '1970-01-01'}, visit_time) as time from tb_page_visit_info_xango where distributor = '" + distributor + "' and alias='" + alias + "'";
-                string strMain = "select alias, ip, visit_time, type, page, refer, country, province, city, province_code, video from tb_page_visit_info_xango where distributor = '" + distributor + "' and alias='" + alias + "'";
+                string strMain = "select a.alias, b.ip, a.visit_time, a.type, a.page, a.refer, b.country, b.province, b.city, b.province_code, a.video from tb_page_visit_info_xango as a, tb_geolocation as b where a.distributor = '" + distributor + "' and alias='" + alias + "' and a.ip=b.ip";
                 //group by token, alias, country, province, city, language, device", startDate, endDate, strDistributor);
-                string strOrder = " order by visit_time desc";
+                string strOrder = " order by a.visit_time desc";
                 strSQL = strMain + strClause + strClause2 + strOrder;
             }
             catch (Exception e)
