@@ -1,0 +1,19 @@
+div.mh-header-mobile-nav.clearfix {
+    display: none;
+}
+
+div.mh-subheader {
+    display: none;
+}
+
+.mh-header {
+    display: none;
+}
+
+.entry-header {
+    display: none;
+}
+
+nav.mh-breadcrumb {
+    display: none;
+}

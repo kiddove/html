@@ -119,6 +119,9 @@
                 } else if (pageType.toLowerCase() === 'si') {
                     InitSingleVisitor(distributor, pageType, startDate, endDate, alias, ad_click_time);
                     $('#dv').addClass('type-selected');
+                } else if (pageType.toLowerCase() === 'pt') {
+                    $('#pt').addClass('type-selected');
+                    RefreshTable('#test', "http://206.190.131.92:6009/SampleAnalytics.ashx?s=" + startDate + "&e=" + endDate + "&d=" + distributor + "&t=" + pageType);
                 } else {
                     // detail visitor
                     $('#dv').addClass('type-selected');
@@ -168,6 +171,9 @@
                                     break;
                             }
                         });
+                        break;
+                    case 3:
+                        $(this).children().eq(0).attr("href", '?s=' + start + '&e=' + end + '&t=pt');
                         break;
                     default:
                         break;
@@ -240,6 +246,52 @@
                     HilightRow();
                 }
             });
+        }
+        function InitPageTrack(usr, type, start, end) {
+            $('#reportrange').removeClass('hide-element');
+            table = $('#test').DataTable({
+                //"dom": '<"top"lf>t<"bottom"ip>',
+                //"processing": true,
+                //"serverSide": true,
+                "autoWidth": true,
+                "destroy": true,
+                "ajax": {
+                    "url": "http://206.190.131.92:6009/SampleAnalytics.ashx?d=" + usr + "&s=" + start + "&e=" + end + "&t=" + type,
+                    //"type": 'POST',
+                    "dataSrc": ""
+                },
+                "columns": [
+                    { "title": "Distributor", "data": "distributor" },
+                    { "title": "Title", "data": "subject" },
+                    { "title": "count", "data": "count" },
+                    { "title": "Page Url", "data": "url", "render": $.fn.dataTable.render.ellipsis(65) },
+                ],
+                "deferRender": true,
+                "ordering": true,
+                "searching": true,
+                "paging": true,
+                "pagingType": "simple_numbers",
+                "info": true,
+                "order": [],
+                //"fixedHeader": true,
+                //"responsive": true,
+                "lengthMenu": [20, 50, 80],
+                "initComplete": function (settings, json) {
+                    $("#test_wrapper").append(spinner);
+                    HilightRow();
+                },
+                "bScrollCollapse": true,
+                scrollX: true,
+
+                //"createdRow": function (row, data, index) {
+                //    if (data.video) {
+                //        //$('td', row).parent().eq(0).addClass('selected');
+                //        $(row).eq(0).addClass('highlighted');
+                //    }
+                //}
+            });
+
+            //table.order([1, 'desc']).draw();
         }
         function InitDetailVisitors(usr, type, start, end) {
 
@@ -1312,6 +1364,12 @@
                     $("#title").html('Traffic From Region(Top 10)');
                     InitTrafficFromRegion(distributor, pageType, startDate, endDate, blogname);
                     $('#ts').addClass('type-selected');
+                } else if (pageType.toLowerCase() === 'pt') {
+                    // detail visitors
+                    $("#title").html('Page Track');
+                    //InitDetailVisitors(distributor, pageType, startDate, endDate);
+                    InitPageTrack(distributor, pageType, startDate, endDate);
+                    $('#pt').addClass('type-selected');
                 } else {
                     $("#title").html('Quick Stats');
                     InitDefault();

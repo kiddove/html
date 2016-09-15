@@ -218,8 +218,7 @@ namespace ADSS
         public static GeoLocation GetGeoLocation(string strIP)
         {
             GeoLocation gl = GetGeoLocationFromDB(strIP);
-            if (string.IsNullOrEmpty(gl.ip) || String.Equals(gl.country_name, "all", StringComparison.OrdinalIgnoreCase)
-                || String.Equals(gl.region_name, "all", StringComparison.OrdinalIgnoreCase) || String.Equals(gl.city, "all", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(gl.ip) || (String.Equals(gl.region_name, "all", StringComparison.OrdinalIgnoreCase) && String.Equals(gl.city, "all", StringComparison.OrdinalIgnoreCase)))
                 gl = GetGeoLocationFromHttp(strIP);
             return gl;
         }
@@ -242,20 +241,24 @@ namespace ADSS
                 }
             }
 
-            if (string.IsNullOrEmpty(gl.ip) || String.Equals(gl.country_name, "all", StringComparison.OrdinalIgnoreCase)
-                || String.Equals(gl.region_name, "all", StringComparison.OrdinalIgnoreCase) || String.Equals(gl.city, "all", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(gl.ip) || string.IsNullOrEmpty(gl.country_name)
+                || string.IsNullOrEmpty(gl.region_name) || string.IsNullOrEmpty(gl.city))
             {
                 // try ip api http://ip-api.com/json/114.187.79.6
                 GeoLocation gl_ipapi = GetGeoLocationFromIPAPI(strIP);
-                if (string.IsNullOrEmpty(gl_ipapi.ip))
-                InsertGeoLocation(gl);
+                if (!string.IsNullOrEmpty(gl_ipapi.ip))
+                    InsertGeoLocation(gl_ipapi);
+                else
+                    InsertGeoLocation(gl);
             }
+            else
+                InsertGeoLocation(gl);
             return gl;
         }
 
         public static GeoLocation GetGeoLocationFromIPAPI(string strIP)
         {
-            GeoLocation_IPAPI gl = new GeoLocation_IPAPI();
+            GeoLocation_IPAPI gl_ipapi = new GeoLocation_IPAPI();
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://ip-api.com/json/" + strIP);
             req.Method = "GET";
             req.KeepAlive = false;
@@ -268,19 +271,18 @@ namespace ADSS
                     StreamReader sr = new StreamReader(stm, Encoding.UTF8);
                     string strJson = sr.ReadToEnd();
 
-                    gl = new JavaScriptSerializer().Deserialize<GeoLocation_IPAPI>(strJson);
+                    gl_ipapi = new JavaScriptSerializer().Deserialize<GeoLocation_IPAPI>(strJson);
                 }
             }
+            GeoLocation gl = new GeoLocation();
 
-            if (String.Equals(gl.status, "success", StringComparison.OrdinalIgnoreCase))
+            if (String.Equals(gl_ipapi.status, "success", StringComparison.OrdinalIgnoreCase))
             {
-
-            }
-            if (string.IsNullOrEmpty(gl.ip) || String.Equals(gl.country_name, "all", StringComparison.OrdinalIgnoreCase)
-                || String.Equals(gl.region_name, "all", StringComparison.OrdinalIgnoreCase) || String.Equals(gl.city, "all", StringComparison.OrdinalIgnoreCase))
-            {
-                // try ip api http://ip-api.com/json/114.187.79.6
-                InsertGeoLocation(gl);
+                gl.ip = gl_ipapi.query;
+                gl.country_name = gl_ipapi.country;
+                gl.region_name = gl_ipapi.regionName;
+                gl.city = gl_ipapi.city;
+                gl.region_code = gl_ipapi.region;
             }
             return gl;
         }
@@ -325,7 +327,7 @@ namespace ADSS
                     {
                         // xi'an for apostrophe problem
                         gl.city = gl.city.Replace("'", "''");
-                        string strSQL = String.Format("insert into tb_geolocation (ip, country, province, city, province_code) values ('{0}', '{1}', '{2}', '{3}', '{4}')", gl.ip, String.IsNullOrEmpty(gl.country_name) ? "all" : gl.country_name, String.IsNullOrEmpty(gl.region_name) ? "all" : gl.region_name, String.IsNullOrEmpty(gl.city) ? "all" : gl.city, String.IsNullOrEmpty(gl.region_code) ? "all" : gl.region_code);
+                        string strSQL = String.Format("insert into tb_geolocation (ip, country, province, city, province_code) values ('{0}', '{1}', '{2}', '{3}', '{4}')", gl.ip, String.IsNullOrEmpty(gl.country_name) ? "all" : gl.country_name, String.IsNullOrEmpty(gl.region_name) ? "all" : gl.region_name, String.IsNullOrEmpty(gl.city) ? "all" : gl.city, gl.region_code);
                         SqlHelper.ExecuteNonQuery(sc, CommandType.Text, strSQL);
                     }
                 }

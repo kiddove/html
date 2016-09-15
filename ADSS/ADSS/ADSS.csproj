@@ -86,6 +86,9 @@
       <DependentUpon>GetStatInfo.ashx</DependentUpon>
     </Compile>
     <Compile Include="GlobalSetting.cs" />
+    <Compile Include="image.ashx.cs">
+      <DependentUpon>image.ashx</DependentUpon>
+    </Compile>
     <Compile Include="oembed.ashx.cs">
       <DependentUpon>oembed.ashx</DependentUpon>
     </Compile>
@@ -110,6 +113,7 @@
     <Content Include="GetGlobalSetting.ashx" />
     <Content Include="oembed.ashx" />
     <Content Include="GetStatInfo.ashx" />
+    <Content Include="image.ashx" />
     <None Include="Properties\PublishProfiles\adss.pubxml" />
     <Content Include="SampleUserInfo.ashx" />
     <Content Include="SampleAnalytics.ashx" />

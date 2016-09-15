@@ -84,8 +84,8 @@ namespace ADSS
         }
         private class RegionItem : PageViewItem
         {
-            public string province {get;set;}
-            public string country {get;set;}
+            public string province { get; set; }
+            public string country { get; set; }
         }
         private class TopFiveStat
         {
@@ -116,6 +116,14 @@ namespace ADSS
             public string video { get; set; }
 
         }
+        private class PageTrackItem
+        {
+            public string distributor { get; set; }
+            public string url { get; set; }
+            public string email { get; set; }
+            public string subject { get; set; }
+            public int count { get; set; }
+        }
         private class UploadAdsStat
         {
             public string url { get; set; }
@@ -124,6 +132,25 @@ namespace ADSS
             public string blog { get; set; }
             public string token { get; set; }
         }
+
+        private class UploadLeadsStat
+        {
+            public string reader { get; set; }
+            public string page { get; set; }
+            public string distributor { get; set; }
+            public string blog { get; set; }
+            public string token { get; set; }
+        }
+
+        private class UploadPageTrack
+        {
+            public string id { get; set; }
+            public string email { get; set; }
+            public string distributor { get; set; }
+            public string url { get; set; }
+            public string title { get; set; }
+        }
+
         private class UploadFingerPrint : UserFingerPrint
         {
             //public string alias { get; set; }   //trigger
@@ -189,6 +216,12 @@ namespace ADSS
                         case "tfr":     // traffic from region, only use city
                             strResult = getTrafficFromRegion(Convert.ToString(context.Request.QueryString["d"]), Convert.ToString(context.Request.QueryString["s"]), Convert.ToString(context.Request.QueryString["e"]), context.Request.QueryString["b"]);
                             break;
+                        case "pt":      // page track
+                            strResult = getPageTrack(Convert.ToString(context.Request.QueryString["d"]), Convert.ToString(context.Request.QueryString["s"]), Convert.ToString(context.Request.QueryString["e"]));
+                            break;
+                        // leads stat to be continued...
+                        // 1. page, count
+                        // 2. time line
                         default:
                             strResult = getDefaultInfo(context.Request.QueryString["d"], context.Request.QueryString["ti"], context.Request.QueryString["b"]);
                             break;
@@ -207,7 +240,7 @@ namespace ADSS
                 {
                     switch (strType.ToLower())
                     {
-                        case "a":   // change alias
+                        case "a":   // change alias --- mason calle in C#
                             // post
                             strResult = updateAlias(context.Request.Form["o"], context.Request.Form["n"], context.Request.Form["d"]);
                             break;
@@ -222,6 +255,14 @@ namespace ADSS
                         case "c":   // ad click
                             strResult = updateTableAds(context.Request.Form["j"]);
                             break;
+                        case "l":   // lead stat
+                            strResult = updateTableLeads(context.Request.Form["j"]);
+                            break;
+                        case "t":   // page track --- mason called in C#
+                            strResult = updateTableTrack(context.Request.Form["id"], context.Request.Form["email"], context.Request.Form["title"], context.Request.Form["distributor"], context.Request.Form["url"]);
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
@@ -230,6 +271,168 @@ namespace ADSS
             context.Response.Charset = Encoding.UTF8.WebName;
             context.Response.AppendHeader("Access-Control-Allow-Origin", "*");
             context.Response.Write(strResult);
+        }
+
+        private string getPageTrack(string distributor, string startDate, string endDate)
+        {
+            // select distributor, email, url, subject, COUNT(uuid) as view_count from tb_page_click_track where distributor = 'kectech' group by uuid, email, distributor, url, subject
+            string strSQL = "";
+            try
+            {
+                string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, visit_time) >= '{0}'", startDate);
+                string strClause2 = String.IsNullOrEmpty(endDate) ? "" : string.Format(" and convert(date, visit_time) <= '{0}'", endDate);
+
+                strSQL = string.Format("select distributor, email, url, subject, COUNT(uuid) as view_count from tb_page_click_track where distributor = '{0}'{1}{2}group by uuid, email, distributor, url, subject", distributor, strClause, strClause2);
+            }
+            catch (Exception e)
+            {
+                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getPageTrack) --- Exception: " + e.Message);
+                return "{}";
+            }
+
+            try
+            {
+                using (SqlConnection sc = new SqlConnection(ConfigurationManager.ConnectionStrings["sqlserver"].ConnectionString))
+                {
+                    if (sc != null)
+                    {
+                        DataSet ds = SqlHelper.ExecuteDataset(sc, CommandType.Text, strSQL);
+                        if (ds != null && ds.Tables.Count > 0)
+                        {
+                            List<PageTrackItem> ptl = new List<PageTrackItem>();
+                            for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                            {
+                                DataRow r = ds.Tables[0].Rows[i];
+                                PageTrackItem pti = new PageTrackItem();
+                                
+                                pti.distributor = Convert.ToString(r[0]);
+                                pti.email = Convert.ToString(r[1]);
+                                string s = Convert.ToString(r[2]);
+                                byte[] data = Convert.FromBase64String(s);
+                                pti.url = Encoding.UTF8.GetString(data);
+
+                                s = Convert.ToString(r[3]);
+                                data = Convert.FromBase64String(s);
+                                pti.subject = Encoding.UTF8.GetString(data);
+
+                                pti.count = Convert.ToInt32(r[4]);
+
+                                ptl.Add(pti);
+                            }
+                            return new JavaScriptSerializer().Serialize(ptl);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                //Trace.WriteLine(e.Message);
+                AdssLogger.WriteLog("GetSampleAnalyticsInfo(getPageTrack sql excute) --- Exception: " + e.Message + " --- sql: " + strSQL);
+            }
+
+            return "{}";
+        }
+
+        private string updateTableTrack(string id, string email, string title, string distributor, string url)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(id))
+                {
+                    //url & title should be encode
+                    byte[] plainTextBytes = System.Text.Encoding.UTF8.GetBytes(url);
+                    string url_encode = Convert.ToBase64String(plainTextBytes);
+                    plainTextBytes = System.Text.Encoding.UTF8.GetBytes(title);
+                    string title_encode = Convert.ToBase64String(plainTextBytes);
+                    string strSQL = "";
+
+                    strSQL = string.Format("insert into tb_page_click_track (uuid, email, distributor, url, subject) values ('{0}', '{1}', '{2}', '{3}', '{4}')",
+                        id, email, distributor, url_encode, title_encode);
+
+                    using (SqlConnection sc = new SqlConnection(ConfigurationManager.ConnectionStrings["sqlserver"].ConnectionString))
+                    {
+                        try
+                        {
+                            SqlHelper.ExecuteNonQuery(sc, CommandType.Text, strSQL);
+                        }
+                        catch (Exception e)
+                        {
+                            AdssLogger.WriteLog("Exception in updateTableLeads(): " + e.Message + " --- sql: " + strSQL);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                //System.Diagnostics.Trace.WriteLine(e.Message);
+                AdssLogger.WriteLog("Exception --- updateTableTrack(): " + e.Message);
+            }
+
+            return "";
+        }
+
+        private string updateTableLeads(string strJson)
+        {
+            // todo 
+            try
+            {
+                JavaScriptSerializer js = new JavaScriptSerializer();
+                UploadLeadsStat uls = js.Deserialize<UploadLeadsStat>(strJson);
+                if (!string.IsNullOrEmpty(uls.reader))
+                {
+                    string strSQL = "";
+
+                    if (!string.IsNullOrEmpty(uls.blog))
+                    {
+                        try
+                        {
+                            strSQL = string.Format("select distributor from tb_blog_to_distributor where blog = '{0}'", uls.blog);
+                            using (SqlConnection sc = new SqlConnection(ConfigurationManager.ConnectionStrings["sqlserver"].ConnectionString))
+                            {
+                                if (sc != null)
+                                {
+                                    DataSet ds = SqlHelper.ExecuteDataset(sc, CommandType.Text, strSQL);
+                                    if (ds != null && ds.Tables.Count > 0)
+                                    {
+                                        for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                                        {
+                                            DataRow r = ds.Tables[0].Rows[i];
+                                            uls.distributor = Convert.ToString(r[0]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            //Trace.WriteLine(e.Message);
+                            AdssLogger.WriteLog("GetSampleAnalyticsInfo(updateTableAds) --- Exception: " + e.Message + " --- sql: " + strSQL);
+                        }
+                    }
+
+                    strSQL = string.Format("insert into tb_page_leads_stat (reader, page, distributor, token) values ('{0}', '{1}', '{2}', '{3}')",
+                        uls.reader, uls.page, string.IsNullOrEmpty(uls.distributor) ? uls.blog : uls.distributor, uls.token);
+
+                    using (SqlConnection sc = new SqlConnection(ConfigurationManager.ConnectionStrings["sqlserver"].ConnectionString))
+                    {
+                        try
+                        {
+                            SqlHelper.ExecuteNonQuery(sc, CommandType.Text, strSQL);
+                        }
+                        catch (Exception e)
+                        {
+                            AdssLogger.WriteLog("Exception in updateTableLeads(): " + e.Message + " --- sql: " + strSQL);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                //System.Diagnostics.Trace.WriteLine(e.Message);
+                AdssLogger.WriteLog("Exception in Deserialize(): " + e.Message);
+            }
+
+            return "";
         }
 
         private string getTrafficFromRegion(string distributor, string startDate, string endDate, string blog)
@@ -757,7 +960,7 @@ namespace ADSS
                 string strClause = String.IsNullOrEmpty(startDate) ? "" : string.Format(" and convert(date, visit_time) >= '{0}'", startDate);
                 string strClause2 = String.IsNullOrEmpty(endDate) ? "" : string.Format(" and convert(date, visit_time) <= '{0}'", endDate);
 
-                strSQL = string.Format("select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango where distributor='{0}'{1}{2} order by d", distributor, strClause, strClause2);               
+                strSQL = string.Format("select distinct CAST(visit_time as DATE) as d from tb_page_visit_info_xango where distributor='{0}'{1}{2} order by d", distributor, strClause, strClause2);
             }
             catch (Exception e)
             {
@@ -857,7 +1060,7 @@ namespace ADSS
                                 // do minus --- return
                                 // because return can be new as well
                                 List<DefaultInfo> dInfo = new List<DefaultInfo>();
-                                for(int i = 0; i < times.Count; i++)
+                                for (int i = 0; i < times.Count; i++)
                                 {
                                     DefaultInfo di = new DefaultInfo();
                                     di.visitor = new Visitor();
@@ -1016,7 +1219,8 @@ namespace ADSS
         {
             if (string.IsNullOrEmpty(blog) || string.IsNullOrEmpty(distributor))
                 return;
-
+            if (string.Compare("undefined", blog, StringComparison.OrdinalIgnoreCase) == 0 || string.Compare("undefined", distributor, StringComparison.OrdinalIgnoreCase) == 0)
+                return;
             string strSQL;
             try
             {
@@ -1093,7 +1297,7 @@ namespace ADSS
                                     }
                                 }
 
-                                if (iDistributor > 0 && iBlog > 0)
+                                if (iDistributor > 0 && iBlog > 0 && iDistributor != iBlog)
                                 {
                                     if (iDistributor < iBlog)
                                     {
